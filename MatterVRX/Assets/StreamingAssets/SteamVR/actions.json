@@ -48,7 +48,7 @@
     {
       "name": "/actions/default/in/TrackPadScroll",
       "type": "vector2",
-      "requirement": "mandatory"
+      "requirement": "optional"
     },
     {
       "name": "/actions/default/out/Haptic",

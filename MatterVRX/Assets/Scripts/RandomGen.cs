@@ -17,9 +17,11 @@ public class RandomGen : MonoBehaviour
                 {
                     GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                     sphere.AddComponent<MeshRenderer>();
+                    sphere.GetComponent<Renderer>().material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
                     sphere.transform.parent = this.transform;
                     sphere.transform.position = new Vector3(x, y, z);
-                    sphere.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
+                    float randomScale = Random.Range(-0.3f, 0.3f);
+                    sphere.transform.localScale = new Vector3(0.4f + randomScale, 0.4f + randomScale, 0.4f + randomScale);
                 }
             }
         } 
