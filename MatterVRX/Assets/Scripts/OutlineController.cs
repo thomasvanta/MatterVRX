@@ -38,4 +38,9 @@ public class OutlineController : MonoBehaviour
             outlineScript.OutlineMode = Outline.Mode.OutlineVisible;
         }
     }
+
+    public bool GetSelected()
+    {
+        return selected;
+    }
 }
