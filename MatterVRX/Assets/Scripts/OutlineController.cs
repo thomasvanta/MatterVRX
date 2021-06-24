@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class OutlineController : MonoBehaviour
 {
+    private bool selected = false;
+
     private Outline outlineScript;
 
     // Start is called before the first frame update
@@ -18,6 +20,22 @@ public class OutlineController : MonoBehaviour
 
     public void EnableOutline(bool enabled)
     {
-        outlineScript.enabled = enabled;
+        outlineScript.enabled = enabled || selected;
+    }
+
+    public void ToggleSelected()
+    {
+        selected = !selected;
+        if (selected)
+        {
+            EnableOutline(true);
+            outlineScript.OutlineColor = new Color(255, 140, 0); // orange
+            outlineScript.OutlineMode = Outline.Mode.OutlineAndSilhouette;
+        }
+        else
+        {
+            outlineScript.OutlineColor = Color.white;
+            outlineScript.OutlineMode = Outline.Mode.OutlineVisible;
+        }
     }
 }

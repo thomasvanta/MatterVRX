@@ -7,6 +7,7 @@ public class LaserPointer : MonoBehaviour
 {
     public SteamVR_Input_Sources handType;
     public SteamVR_Behaviour_Pose controllerPose;
+    public SteamVR_Action_Boolean grabGrip;
 
     public GameObject laserPrefab;
     private GameObject laser;
@@ -37,7 +38,14 @@ public class LaserPointer : MonoBehaviour
 
             hitPoint = hit.point;
             OutlineController ctrl = hit.collider.gameObject.GetComponent<OutlineController>();
-            if (ctrl != null) ctrl.EnableOutline(true);
+            if (ctrl != null)
+            {
+                ctrl.EnableOutline(true);
+                if (GetGrabGrip())
+                {
+                    ctrl.ToggleSelected();
+                }
+            }
             prevHit = hit.collider.gameObject;
             ShowLaser(hit);
         }
@@ -59,5 +67,10 @@ public class LaserPointer : MonoBehaviour
         laserTransform.position = Vector3.Lerp(controllerPose.transform.position, hitPoint, .5f);
         laserTransform.LookAt(hitPoint);
         laserTransform.localScale = new Vector3(laserTransform.localScale.x, laserTransform.localScale.y, hit.distance);
+    }
+
+    private bool GetGrabGrip()
+    {
+        return grabGrip.GetStateDown(handType);
     }
 }
