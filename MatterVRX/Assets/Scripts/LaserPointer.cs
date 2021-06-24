@@ -13,6 +13,8 @@ public class LaserPointer : MonoBehaviour
     private Transform laserTransform;
     private Vector3 hitPoint;
 
+    private GameObject prevHit = null;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -27,12 +29,27 @@ public class LaserPointer : MonoBehaviour
 
         if (Physics.Raycast(controllerPose.transform.position, transform.forward, out hit, 100))
         {
+            if (prevHit != null && prevHit != hit.collider.gameObject)
+            {
+                OutlineController prevCtrl = prevHit.GetComponent<OutlineController>();
+                if (prevCtrl != null) prevCtrl.EnableOutline(false);
+            }
+
             hitPoint = hit.point;
+            OutlineController ctrl = hit.collider.gameObject.GetComponent<OutlineController>();
+            if (ctrl != null) ctrl.EnableOutline(true);
+            prevHit = hit.collider.gameObject;
             ShowLaser(hit);
         }
         else
         {
             laser.SetActive(false);
+            if (prevHit != null)
+            {
+                OutlineController prevCtrl = prevHit.GetComponent<OutlineController>();
+                if (prevCtrl != null) prevCtrl.EnableOutline(false);
+                prevHit = null;
+            }
         }
     }
 

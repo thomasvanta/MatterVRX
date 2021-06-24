@@ -5,6 +5,7 @@ using UnityEngine;
 public class RandomGen : MonoBehaviour
 {
     public int size = 3;
+    public GameObject spherePrefab;
 
     // Start is called before the first frame update
     void Start()
@@ -15,13 +16,11 @@ public class RandomGen : MonoBehaviour
             {
                 for (int z = 0; z < size; z++)
                 {
-                    GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    sphere.AddComponent<MeshRenderer>();
-                    sphere.GetComponent<Renderer>().material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+                    GameObject sphere = Instantiate(spherePrefab);
+                    sphere.GetComponent<VisualManager>().SetColor(Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f));
                     sphere.transform.parent = this.transform;
                     sphere.transform.position = new Vector3(x, y, z);
-                    float randomScale = Random.Range(-0.3f, 0.3f);
-                    sphere.transform.localScale = new Vector3(0.4f + randomScale, 0.4f + randomScale, 0.4f + randomScale);
+                    sphere.GetComponent<VisualManager>().SetScale(Random.Range(0.05f, 0.5f));
                 }
             }
         } 
