@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
 
-public class MoveRightHand : MonoBehaviour // the right hand is used for vertical movement
+public class VerticalMovement : MonoBehaviour // the right hand is used for vertical movement
 {
     public SteamVR_Input_Sources handType;
     public SteamVR_Action_Vector2 trackPad;

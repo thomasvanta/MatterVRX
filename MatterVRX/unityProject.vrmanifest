@@ -5,7 +5,7 @@
       "app_key": "application.generated.unity.mattervrx.exe",
       "launch_type": "url",
       "url": "steam://launch/",
-      "action_manifest_path": "D:\\Dev info\\Projets\\Unity\\Stage 2A\\MatterVRX\\MatterVRX\\Assets\\StreamingAssets\\SteamVR\\actions.json",
+      "action_manifest_path": "C:\\Users\\malan\\Desktop\\Dev\\Stage 2A\\MatterVRX\\MatterVRX\\Assets\\StreamingAssets\\SteamVR\\actions.json",
       "strings": {
         "en_us": {
           "name": "MatterVRX [Testing]"
