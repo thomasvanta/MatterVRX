@@ -7,7 +7,6 @@ public class VerticalMovement : MonoBehaviour // the right hand is used for vert
 {
     public SteamVR_Input_Sources handType;
     public SteamVR_Action_Vector2 trackPad;
-    public GameObject voxels;
 
     // parameter to export in config file
     public float verticalSpeed = 1;
@@ -22,7 +21,7 @@ public class VerticalMovement : MonoBehaviour // the right hand is used for vert
         Vector2 v = GetTrackPad();
         if (v.y != 0)
         {
-            voxels.transform.position += new Vector3(0, v.y, 0) * Time.deltaTime * verticalSpeed;
+            this.transform.position += new Vector3(0, v.y, 0) * Time.deltaTime * verticalSpeed;
         }
     }
 

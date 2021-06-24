@@ -7,7 +7,6 @@ public class HorizontalMovement : MonoBehaviour // left hand for horizontal move
 {
     public SteamVR_Input_Sources handType;
     public SteamVR_Action_Vector2 trackPad;
-    public GameObject voxels;
     public Camera playerCamera;
 
     // parameter to export in config file
@@ -19,16 +18,12 @@ public class HorizontalMovement : MonoBehaviour // left hand for horizontal move
     // Update is called once per frame
     void Update()
     {
-        if (voxels != null)
-        {
-            Vector2 v = GetDirection();
+        Vector2 v = GetDirection();
 
-            Vector3 move = new Vector3(playerCamera.transform.forward.x * v.y + playerCamera.transform.right.x * v.x,
-                0, playerCamera.transform.forward.z * v.y + playerCamera.transform.right.z * v.x);
+        Vector3 move = new Vector3(playerCamera.transform.forward.x * v.y + playerCamera.transform.right.x * v.x,
+            0, playerCamera.transform.forward.z * v.y + playerCamera.transform.right.z * v.x);
 
-            voxels.transform.position += move * Time.deltaTime * horizontalSpeed;
-
-        }
+        this.transform.position += move * Time.deltaTime * horizontalSpeed;
     }
 
     public Vector2 GetDirection()
