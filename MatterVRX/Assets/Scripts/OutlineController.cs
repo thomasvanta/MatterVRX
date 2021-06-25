@@ -29,7 +29,7 @@ public class OutlineController : MonoBehaviour
         if (selected)
         {
             EnableOutline(true);
-            outlineScript.OutlineColor = new Color(255, 140, 0); // orange
+            outlineScript.OutlineColor = Color.red; //new Color(255, 140, 0); // orange
             outlineScript.OutlineMode = Outline.Mode.OutlineAndSilhouette;
         }
         else

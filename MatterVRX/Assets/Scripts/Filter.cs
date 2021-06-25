@@ -12,11 +12,31 @@ public class Filter : MonoBehaviour
         Unselected
     }
 
+    public SteamVR_Input_Sources handType;
+    public SteamVR_Action_Boolean menuButton;
+
+    private FilterOn curFilter = FilterOn.None;
+
     // Start is called before the first frame update
     void Start() {}
 
     // Update is called once per frame
-    void Update() {}
+    void Update() 
+    {
+        if(GetMenuButton())
+        {
+            if(curFilter == FilterOn.None)
+            {
+                curFilter = FilterOn.Selected;
+            }
+            else
+            {
+                curFilter = FilterOn.None;
+            }
+
+            FilterVoxels(curFilter);
+        }
+    }
 
     public void FilterVoxels(FilterOn mode)
     {
@@ -47,5 +67,10 @@ public class Filter : MonoBehaviour
             }
                 
         }
+    }
+
+    private bool GetMenuButton()
+    {
+        return menuButton.GetStateDown(handType);
     }
 }
