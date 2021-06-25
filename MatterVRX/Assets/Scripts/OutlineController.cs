@@ -15,8 +15,10 @@ public class OutlineController : MonoBehaviour
         outlineScript.enabled = false;
     }
 
+    /*
     // Update is called once per frame
     void Update() {}
+    */
 
     public void EnableOutline(bool enabled)
     {

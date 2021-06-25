@@ -9,8 +9,10 @@ public class Reset : MonoBehaviour
     public SteamVR_Input_Sources rightHandType;
     public SteamVR_Action_Boolean clickPad;
 
+    /*
     // Start is called before the first frame update
-    void Start() {}
+    void Start() { }
+    */
 
     // Update is called once per frame
     void Update()

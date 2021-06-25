@@ -12,8 +12,10 @@ public class HorizontalMovement : MonoBehaviour // left hand for horizontal move
     // parameter to export in config file
     public float horizontalSpeed = 1;
 
+    /*
     // Start is called before the first frame update
     void Start() { }
+    */
 
     // Update is called once per frame
     void Update()
