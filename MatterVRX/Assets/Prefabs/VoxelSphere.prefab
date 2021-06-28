@@ -16,11 +16,11 @@ GameObject:
   - component: {fileID: 5946289650899652606}
   - component: {fileID: 7088076106858703672}
   m_Layer: 0
-  m_Name: Voxel
+  m_Name: VoxelSphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &5946289650899652602
 Transform:
