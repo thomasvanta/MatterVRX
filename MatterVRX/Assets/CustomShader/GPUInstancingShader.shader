@@ -14,9 +14,12 @@ Shader "Unlit/GPUInstancingShader"
         Pass
         {
             CGPROGRAM
+            #pragma target 5.0
             #pragma vertex vert
             #pragma fragment frag
             #pragma multi_compile_instancing
+            // make fog work
+            #pragma multi_compile_fog
 
             #include "UnityCG.cginc"
 
@@ -30,6 +33,7 @@ Shader "Unlit/GPUInstancingShader"
             {
                 UNITY_VERTEX_INPUT_INSTANCE_ID
                 float4 vertex : SV_POSITION;
+                UNITY_FOG_COORDS(1)
                 UNITY_VERTEX_OUTPUT_STEREO
             };
 
@@ -45,6 +49,7 @@ Shader "Unlit/GPUInstancingShader"
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
                 UNITY_TRANSFER_INSTANCE_ID(v, o);
                 o.vertex = UnityObjectToClipPos(v.vertex);
+                UNITY_TRANSFER_FOG(o, o.vertex);
                 return o;
             }
 
@@ -53,6 +58,9 @@ Shader "Unlit/GPUInstancingShader"
                 UNITY_SETUP_INSTANCE_ID(i);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
                 fixed4 col = UNITY_ACCESS_INSTANCED_PROP(InstanceProperties, _Color);
+                // apply fog
+                UNITY_APPLY_FOG(i.fogCoord, col);
+
                 return col;
             }
             ENDCG
