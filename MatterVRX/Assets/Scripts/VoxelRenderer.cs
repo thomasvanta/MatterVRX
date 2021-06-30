@@ -17,20 +17,6 @@ public class VoxelRenderer : MonoBehaviour
     private void Start()
     {
         vfx = GetComponent<VisualEffect>();
-
-        Vector3[] pos = new Vector3[(int)resolution * (int)resolution];
-        Color[] colors = new Color[(int)resolution * (int)resolution];
-
-        for (int x = 0; x < (int)resolution; x++)
-        {
-            for (int y = 0; y < (int)resolution; y++)
-            {
-                pos[x + y * (int)resolution] = new Vector3(Random.value * 10, Random.value * 10, Random.value * 10);
-                colors[x + y * (int)resolution] = new Color(Random.value, Random.value, Random.value, 1);
-            }
-        }
-
-        SetParticles(pos, colors);
     }
 
     private void Update()
@@ -47,6 +33,12 @@ public class VoxelRenderer : MonoBehaviour
         }
     }
 
+    public int SetResolutionFromVolume(int volume)
+    {
+        resolution = (uint)Mathf.CeilToInt(Mathf.Sqrt(volume));
+        return (int)resolution;
+    }
+
     public void SetParticles(Vector3[] positions, Color[] colors)
     {
         texColor = new Texture2D(positions.Length > (int)resolution ? (int)resolution : positions.Length, Mathf.Clamp(positions.Length / (int)resolution, 1, (int)resolution), TextureFormat.RGBAFloat, false);
@@ -59,7 +51,11 @@ public class VoxelRenderer : MonoBehaviour
             for (int x = 0; x < texWidth; x++)
             {
                 int index = x + y * texWidth;
-                texColor.SetPixel(x, y, colors[index]);
+
+                Color c = colors[index];
+                if (c.r == 0 && c.g == 0 && c.b == 0) c = Color.white; // if the color is black, turn it white
+                texColor.SetPixel(x, y, c);
+
                 var data = new Color(positions[index].x, positions[index].y, positions[index].z, particleSize);
                 texPosScale.SetPixel(x, y, data);
             }
