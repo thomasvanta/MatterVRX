@@ -44,12 +44,10 @@ public class ChunkGpuInstacing : MonoBehaviour
     void Update()
     {
         Vector3 adjustedPosition = transform.localPosition / transform.localScale.x - centerOffset;
-        Vector3Int curCenter = new Vector3Int((int)System.Math.Floor(adjustedPosition.x / chunkSize),
-            (int)System.Math.Floor(adjustedPosition.y / chunkSize),
-            (int)System.Math.Floor(adjustedPosition.z / chunkSize));
+        Vector3Int curCenter = new Vector3Int((int)System.Math.Floor(-0.5f + adjustedPosition.x / chunkSize),
+            (int)System.Math.Floor(-0.5f + adjustedPosition.y / chunkSize),
+            (int)System.Math.Floor(-0.5f + adjustedPosition.z / chunkSize));
         curCenter *= - 1;
-        int offset = (int)System.Math.Floor((double)nbChunkDisplay / 2);
-        curCenter += new Vector3Int(offset, offset, offset);
         if (curCenter != centerChunk)
         {
             centerChunk = curCenter;
@@ -146,14 +144,13 @@ public class ChunkGpuInstacing : MonoBehaviour
 
     void emptyChunk(Chunk chunk)
     {
-        print("empty chunk : " + chunk.chunkPos);
         for (int x = 0; x < chunkSize; x++)
         {
             for (int y = 0; y < chunkSize; y++)
             {
                 for (int z = 0; z < chunkSize; z++)
                 {
-                    if(chunk.voxels != null) 
+                    if(chunk.voxels != null && chunk.voxels[x, y, z] != null) 
                         Destroy(chunk.voxels[x, y, z].gameObject);
                 }
             }
