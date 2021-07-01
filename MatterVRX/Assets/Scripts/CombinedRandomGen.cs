@@ -10,7 +10,11 @@ public class CombinedRandomGen : MonoBehaviour
     public float interestingChance = 0.2f;
 
     public int size = 3;
-    public GameObject spherePrefab;
+    public Transform prefab;
+
+    // parameter to export in config file
+    public float minScale = 0.05f;
+    public float maxScale = 0.3f;
 
     // Start is called before the first frame update
     void Start()
@@ -21,6 +25,8 @@ public class CombinedRandomGen : MonoBehaviour
         Color[] particlesColors = new Color[vfxResolution * vfxResolution];
         int i = 0;
 
+        MaterialPropertyBlock properties = new MaterialPropertyBlock();
+
         for (int x = 0; x < size; x++)
         {
             for (int y = 0; y < size; y++)
@@ -29,11 +35,12 @@ public class CombinedRandomGen : MonoBehaviour
                 {
                     if (Random.value < interestingChance)
                     {
-                        GameObject sphere = Instantiate(spherePrefab);
-                        sphere.GetComponent<VisualManager>().SetColor(Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f));
-                        sphere.transform.parent = PrefabVoxels.transform;
-                        sphere.transform.position = new Vector3(x, y, z);
-                        sphere.GetComponent<VisualManager>().SetScale(Random.Range(0.05f, 0.5f));
+                        Transform t = Instantiate(prefab);
+                        t.SetParent(transform);
+                        t.position = new Vector3(x, y, z);
+                        t.GetComponent<VisualManager>().SetScale(Random.Range(minScale, maxScale));
+                        properties.SetColor("_Color", Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f));
+                        t.GetComponent<MeshRenderer>().SetPropertyBlock(properties);
                     }
                     else
                     {
