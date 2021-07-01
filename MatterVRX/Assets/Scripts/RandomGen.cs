@@ -6,6 +6,7 @@ public class RandomGen : MonoBehaviour
 {
     public int size = 3;
     public GameObject spherePrefab;
+    public Camera cam;
 
     // parameter to export in config file
     public float minScale = 0.05f;
@@ -21,6 +22,10 @@ public class RandomGen : MonoBehaviour
                 for (int z = 0; z < size; z++)
                 {
                     GameObject sphere = Instantiate(spherePrefab);
+
+                    Billboard b = sphere.GetComponent<Billboard>();
+                    if (b != null) b.cam = cam;
+
                     sphere.GetComponent<VisualManager>().SetColor(Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f));
                     sphere.transform.parent = this.transform;
                     sphere.transform.position = new Vector3(x, y, z);
