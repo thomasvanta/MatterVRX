@@ -8,6 +8,10 @@ public class UIFaceCamera : MonoBehaviour
 
     void Update()
     {
-        if (cam != null) this.transform.LookAt(cam.transform);
+        if (cam != null)
+        {
+            this.transform.LookAt(cam.transform);
+            this.transform.forward *= -1;
+        }
     }
 }
