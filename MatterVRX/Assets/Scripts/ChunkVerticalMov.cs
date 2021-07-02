@@ -1,0 +1,34 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Valve.VR;
+
+public class ChunkVerticalMov : MonoBehaviour
+{
+    public SteamVR_Input_Sources handType;
+    public SteamVR_Action_Vector2 trackPad;
+
+    // parameter to export in config file
+    public float verticalSpeed = 1;
+
+
+    /*
+    // Start is called before the first frame update
+    void Start() { }
+    */
+
+    // Update is called once per frame
+    void Update()
+    {
+        Vector2 v = GetTrackPad();
+        if (v.y != 0)
+        {
+            this.transform.position += new Vector3(0, v.y, 0) * Time.deltaTime * verticalSpeed * (float)System.Math.Log(1 + transform.localScale.x);
+        }
+    }
+
+    public Vector2 GetTrackPad()
+    {
+        return trackPad.GetAxis(handType);
+    }
+}

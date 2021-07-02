@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class ChunkGpuInstacing : MonoBehaviour
 {
+    public enum UnloadMode
+    {
+        Destroy,
+        SetInactive
+    }
+
     public int globalSize = 100;
     public int chunkSize = 5;
     public int nbChunkDisplay = 5;
@@ -11,6 +17,7 @@ public class ChunkGpuInstacing : MonoBehaviour
     public float maxScale = 0.5f;
     public Transform prefab;
     public Vector3 centerOffset = new Vector3(0, 0, 0);
+    public UnloadMode unloadMode = UnloadMode.Destroy;
 
     struct Voxel
     {
@@ -37,7 +44,6 @@ public class ChunkGpuInstacing : MonoBehaviour
         centerChunk = new Vector3Int(3, 3, 3);
         displayChunkMatrix = initDisplay(dataSet, centerChunk);
         transform.localPosition = -(centerChunk + new Vector3(0.5f, 0.5f, 0.5f)) * chunkSize + centerOffset;
-        print("center chunk : " + centerChunk);
     }
 
     // Update is called once per frame
@@ -115,10 +121,49 @@ public class ChunkGpuInstacing : MonoBehaviour
                 for (int z = 0; z < chunkSize; z++)
                 {
                     if (chunk.voxels != null && chunk.voxels[x, y, z] != null)
-                        Destroy(chunk.voxels[x, y, z].gameObject);
+                    {
+                        switch(unloadMode)
+                        {
+                            case UnloadMode.Destroy:
+                                Destroy(chunk.voxels[x, y, z].gameObject);
+                                break;
+
+                            case UnloadMode.SetInactive:
+                                chunk.voxels[x, y, z].gameObject.SetActive(false);
+                                break;
+
+                            default:
+                                break;
+
+                        }
+                        
+                    }
+                        
                 }
             }
         }
+    }
+
+    Chunk fillChunk(Voxel[,,] dataSet, Chunk[,,] chunksMatrix, Vector3Int pos)
+    {
+        if(chunksMatrix[pos.x, pos.y, pos.z].voxels == null)
+        {
+            return populateChunk(dataSet, pos);
+        }
+        if(chunksMatrix[pos.x, pos.y, pos.z].voxels[0,0,0].gameObject.activeSelf == false)
+        {
+            for (int x = 0; x < chunkSize; x++)
+            {
+                for (int y = 0; y < chunkSize; y++)
+                {
+                    for (int z = 0; z < chunkSize; z++)
+                    {
+                        chunksMatrix[pos.x, pos.y, pos.z].voxels[x, y, z].gameObject.SetActive(true);
+                    }
+                }
+            }
+        }
+        return chunksMatrix[pos.x, pos.y, pos.z];
     }
 
 
@@ -165,8 +210,6 @@ public class ChunkGpuInstacing : MonoBehaviour
         Vector3Int delta = newCenterChunk - oldCenterChunk;
         delta.Clamp(-Vector3Int.one, Vector3Int.one);
         int chunkOffset = (int)System.Math.Floor((double)nbChunkDisplay / 2);
-        print("delta : " + delta);
-        print("offSet : " + chunkOffset);
 
         Vector3Int pos = Vector3Int.zero;
 
@@ -187,10 +230,9 @@ public class ChunkGpuInstacing : MonoBehaviour
                     pos.Set(oldCenterChunk.x + delta.x * (chunkOffset + 1),
                         oldCenterChunk.y - chunkOffset + i,
                         oldCenterChunk.z - chunkOffset + j);
-                    if(isInChunkPosRange(pos) &&
-                        chunksMatrix[pos.x, pos.y, pos.z].voxels == null)
+                    if(isInChunkPosRange(pos))
                     {
-                        chunksMatrix[pos.x, pos.y, pos.z] = populateChunk(dataSet, pos);
+                        chunksMatrix[pos.x, pos.y, pos.z] = fillChunk(dataSet, chunksMatrix, pos);
                     }
 
                 }
@@ -213,10 +255,9 @@ public class ChunkGpuInstacing : MonoBehaviour
                     pos.Set(oldCenterChunk.x - chunkOffset + i,
                         oldCenterChunk.y + delta.y * (chunkOffset + 1),
                         oldCenterChunk.z - chunkOffset + j);
-                    if (isInChunkPosRange(pos) &&
-                        chunksMatrix[pos.x, pos.y, pos.z].voxels == null)
+                    if (isInChunkPosRange(pos))
                     {
-                        chunksMatrix[pos.x, pos.y, pos.z] = populateChunk(dataSet, pos);
+                        chunksMatrix[pos.x, pos.y, pos.z] = fillChunk(dataSet, chunksMatrix, pos);
                     }
 
                 }
@@ -239,10 +280,9 @@ public class ChunkGpuInstacing : MonoBehaviour
                     pos.Set(oldCenterChunk.x - chunkOffset + i,
                         oldCenterChunk.y - chunkOffset + j,
                         oldCenterChunk.z + delta.z * (chunkOffset + 1));
-                    if (isInChunkPosRange(pos) &&
-                        chunksMatrix[pos.x, pos.y, pos.z].voxels == null)
+                    if (isInChunkPosRange(pos))
                     {
-                        chunksMatrix[pos.x, pos.y, pos.z] = populateChunk(dataSet, pos);
+                        chunksMatrix[pos.x, pos.y, pos.z] = fillChunk(dataSet, chunksMatrix, pos);
                     }
 
                 }
