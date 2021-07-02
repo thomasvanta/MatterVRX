@@ -18,6 +18,7 @@ public class ChunkGpuInstacing : MonoBehaviour
     public Transform prefab;
     public Vector3 centerOffset = new Vector3(0, 0, 0);
     public UnloadMode unloadMode = UnloadMode.Destroy;
+    public bool fullLoad = false;
 
     struct Voxel
     {
@@ -42,8 +43,16 @@ public class ChunkGpuInstacing : MonoBehaviour
         dataSet = populateDataSet();
         maxChunkPos = (int)System.Math.Ceiling((double)globalSize / chunkSize);
         centerChunk = new Vector3Int(3, 3, 3);
-        displayChunkMatrix = initDisplay(dataSet, centerChunk);
         transform.localPosition = -(centerChunk + new Vector3(0.5f, 0.5f, 0.5f)) * chunkSize + centerOffset;
+        if(unloadMode == UnloadMode.SetInactive && fullLoad)
+        {
+            displayChunkMatrix = fullLoadChunk(dataSet);
+            displayChunk();
+        }
+        else
+        {
+            displayChunkMatrix = initDisplay(dataSet, centerChunk);
+        }
     }
 
     // Update is called once per frame
@@ -174,34 +183,45 @@ public class ChunkGpuInstacing : MonoBehaviour
         int offset = (int)System.Math.Floor((double)nbChunkDisplay / 2);
 
         Chunk[,,] chunks = new Chunk[maxChunkPos, maxChunkPos, maxChunkPos];
+        Vector3Int pos = Vector3Int.zero;
 
         for (int x = 0; x < nbChunkDisplay; x++)
         {
-            // do nothing if outside the dataSet
-            if (centerChunk.x - offset + x > 0 &&
-                centerChunk.x - offset + x < maxChunkPos)
-            {
-                for (int y = 0; y < nbChunkDisplay; y++)
+            for (int y = 0; y < nbChunkDisplay; y++)
+            {    
+                for (int z = 0; z < nbChunkDisplay; z++)
                 {
-                    // do nothing if outside the dataSet
-                    if (centerChunk.y - offset + y > 0 &&
-                        centerChunk.y - offset + y < maxChunkPos)
+                    pos.Set(centerChunk.x - offset + x,
+                        centerChunk.y - offset + y,
+                        centerChunk.z - offset + z);
+                    if (isInChunkPosRange(pos))
                     {
-                        for (int z = 0; z < nbChunkDisplay; z++)
-                        {
-                            // do nothing if outside the dataSet
-                            if (centerChunk.z - offset + z > 0 &&
-                                centerChunk.z - offset + z < maxChunkPos)
-                            {
-                                Vector3Int chunkPos = centerChunk + new Vector3Int(x - offset, y - offset, z - offset);
-                                chunks[chunkPos.x, chunkPos.y, chunkPos.z] = populateChunk(dataSet, chunkPos);
-                            }
-                        }
+                        Vector3Int chunkPos = centerChunk + new Vector3Int(x - offset, y - offset, z - offset);
+                        chunks[chunkPos.x, chunkPos.y, chunkPos.z] = populateChunk(dataSet, chunkPos);
                     }
                 }
+                    
             }
         }
 
+        return chunks;
+    }
+
+    Chunk[,,] fullLoadChunk(Voxel[,,] dataSet)
+    {
+        Chunk[,,] chunks = new Chunk[maxChunkPos, maxChunkPos, maxChunkPos];
+
+        for (int x = 0; x < maxChunkPos; x++)
+        {
+            for (int y = 0; y < maxChunkPos; y++)
+            {
+                for (int z = 0; z < maxChunkPos; z++)
+                {
+                    chunks[x, y, z] = populateChunk(dataSet, new Vector3Int(x,y,z));
+                    emptyChunk(chunks[x, y, z]); // in SetInactive mode, this will just hide them
+                }
+            }
+        }
         return chunks;
     }
 
@@ -301,5 +321,28 @@ public class ChunkGpuInstacing : MonoBehaviour
         if (pos.z < 0) return false;
         if (pos.z >= maxChunkPos) return false;
         return true;
+    }
+
+    public void displayChunk() // methode called by filter
+    {
+        Vector3Int pos = Vector3Int.zero;
+        int offset = (int)System.Math.Floor((double)nbChunkDisplay / 2);
+
+        for (int x = 0; x < nbChunkDisplay; x++)
+        {
+            for (int y = 0; y < nbChunkDisplay; y++)
+            {
+                for (int z = 0; z < nbChunkDisplay; z++)
+                {
+                    pos.Set(centerChunk.x - offset + x,
+                        centerChunk.y - offset + y,
+                        centerChunk.z - offset + z);
+                    if (isInChunkPosRange(pos))
+                    {
+                        displayChunkMatrix[pos.x, pos.y, pos.z] = fillChunk(dataSet, displayChunkMatrix, pos);
+                    }
+                }
+            }
+        }
     }
 }
