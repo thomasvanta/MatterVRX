@@ -10,6 +10,8 @@ public class VRInputModule : BaseInputModule
     public SteamVR_Input_Sources handType;
     public SteamVR_Action_Boolean click;
 
+    public GameObject indicator;
+
     private GameObject curObject = null;
     private PointerEventData data = null;
 
@@ -28,6 +30,8 @@ public class VRInputModule : BaseInputModule
         eventSystem.RaycastAll(data, m_RaycastResultCache);
         data.pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
         curObject = data.pointerCurrentRaycast.gameObject;
+
+        indicator.transform.position = data.pointerCurrentRaycast.worldPosition;
 
         m_RaycastResultCache.Clear();
 
