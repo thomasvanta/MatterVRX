@@ -18,8 +18,7 @@ public class OutlineController : MonoBehaviour
         outlineScript.enabled = false;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void UpdateInfo(Camera camera)
     {
         if (info != null && !outlineScript.enabled)
         {
@@ -30,7 +29,8 @@ public class OutlineController : MonoBehaviour
         {
             info = Instantiate(infoPrefab);
             info.GetComponent<UIFillInfo>().Init(this.transform.position, new UIFillInfo.Voxel() { color = Color.red, scale = 0.2f });
-            info.GetComponent<UIFaceCamera>().SetCamera(Camera.main);
+            info.GetComponent<UIFaceCamera>().cam = camera;
+            info.transform.position = this.transform.position + new Vector3(0, 0, 1);
         }
     }
 

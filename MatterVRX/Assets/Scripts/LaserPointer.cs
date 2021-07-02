@@ -10,6 +10,9 @@ public class LaserPointer : MonoBehaviour
     public SteamVR_Action_Boolean grabGrip;
 
     public GameObject laserPrefab;
+
+    public Camera cam;
+
     private GameObject laser;
     private Transform laserTransform;
     private Vector3 hitPoint;
@@ -33,7 +36,11 @@ public class LaserPointer : MonoBehaviour
             if (prevHit != null && prevHit != hit.collider.gameObject)
             {
                 OutlineController prevCtrl = prevHit.GetComponent<OutlineController>();
-                if (prevCtrl != null) prevCtrl.EnableOutline(false);
+                if (prevCtrl != null)
+                {
+                    prevCtrl.EnableOutline(false);
+                    prevCtrl.UpdateInfo(cam);
+                }
             }
 
             hitPoint = hit.point;
@@ -41,6 +48,7 @@ public class LaserPointer : MonoBehaviour
             if (ctrl != null)
             {
                 ctrl.EnableOutline(true);
+                ctrl.UpdateInfo(cam);
                 if (GetGrabGrip())
                 {
                     ctrl.ToggleSelected();
@@ -55,7 +63,11 @@ public class LaserPointer : MonoBehaviour
             if (prevHit != null)
             {
                 OutlineController prevCtrl = prevHit.GetComponent<OutlineController>();
-                if (prevCtrl != null) prevCtrl.EnableOutline(false);
+                if (prevCtrl != null)
+                {
+                    prevCtrl.EnableOutline(false);
+                    prevCtrl.UpdateInfo(cam);
+                }
                 prevHit = null;
             }
         }
