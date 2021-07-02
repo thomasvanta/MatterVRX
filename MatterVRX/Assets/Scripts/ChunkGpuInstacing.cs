@@ -43,19 +43,20 @@ public class ChunkGpuInstacing : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Vector3 adjustedPosition = transform.localPosition / transform.localScale.x - centerOffset;
-        Vector3Int curCenter = new Vector3Int((int)System.Math.Floor(-0.5f + adjustedPosition.x / chunkSize),
-            (int)System.Math.Floor(-0.5f + adjustedPosition.y / chunkSize),
-            (int)System.Math.Floor(-0.5f + adjustedPosition.z / chunkSize));
-        curCenter *= - 1;
+        Vector3 delta = centerOffset - transform.localPosition;
+        Vector3 chunkScale = chunkSize * transform.localScale;
+
+        Vector3Int curCenter = new Vector3Int((int)System.Math.Floor(delta.x/chunkScale.x),
+            (int)System.Math.Floor(delta.y / chunkScale.y),
+            (int)System.Math.Floor(delta.z / chunkScale.z));
+
         if (curCenter != centerChunk)
         {
-            centerChunk = curCenter;
-            print("center chunk : " + centerChunk);
-            moveDisplayedChunk(dataSet, displayChunkMatrix, curCenter);
+            moveDisplayedChunk(dataSet, displayChunkMatrix, centerChunk, curCenter);
         }
     }
 
+    // "read" dataSet (here set randomly)
     Voxel[,,] populateDataSet()
     {
         Voxel[,,] data = new Voxel[globalSize, globalSize, globalSize];
@@ -74,6 +75,7 @@ public class ChunkGpuInstacing : MonoBehaviour
         }
         return data;
     }
+
 
     
     Chunk populateChunk(Voxel[,,] dataSet, Vector3Int chunkPos)
@@ -103,6 +105,22 @@ public class ChunkGpuInstacing : MonoBehaviour
         }
         return chunk;
     }
+
+    void emptyChunk(Chunk chunk)
+    {
+        for (int x = 0; x < chunkSize; x++)
+        {
+            for (int y = 0; y < chunkSize; y++)
+            {
+                for (int z = 0; z < chunkSize; z++)
+                {
+                    if (chunk.voxels != null && chunk.voxels[x, y, z] != null)
+                        Destroy(chunk.voxels[x, y, z].gameObject);
+                }
+            }
+        }
+    }
+
 
 
     Chunk[,,] initDisplay(Voxel[,,] dataSet, Vector3Int centerChunk)
@@ -142,96 +160,97 @@ public class ChunkGpuInstacing : MonoBehaviour
         return chunks;
     }
 
-    void emptyChunk(Chunk chunk)
+    void moveDisplayedChunk(Voxel[,,] dataSet, Chunk[,,] chunksMatrix, Vector3Int oldCenterChunk, Vector3Int newCenterChunk)
     {
-        for (int x = 0; x < chunkSize; x++)
-        {
-            for (int y = 0; y < chunkSize; y++)
-            {
-                for (int z = 0; z < chunkSize; z++)
-                {
-                    if(chunk.voxels != null && chunk.voxels[x, y, z] != null) 
-                        Destroy(chunk.voxels[x, y, z].gameObject);
-                }
-            }
-        }
-    }
+        Vector3Int delta = newCenterChunk - oldCenterChunk;
+        delta.Clamp(-Vector3Int.one, Vector3Int.one);
+        int chunkOffset = (int)System.Math.Floor((double)nbChunkDisplay / 2);
+        print("delta : " + delta);
+        print("offSet : " + chunkOffset);
 
-
-    void moveDisplayedChunk(Voxel[,,] dataSet, Chunk[,,] chunksMatrix, Vector3Int newCenterChunk)
-    {
-        //remove unused chunk
-        int outerLayerOffset = (int)System.Math.Floor((double)nbChunkDisplay / 2) + 1;
         Vector3Int pos = Vector3Int.zero;
-        for(int i = 0; i < nbChunkDisplay + 2; i++)
+
+        if (delta.x != 0)
         {
-            for(int j = 0; j < nbChunkDisplay + 2; j++)
+            for (int i = 0; i < nbChunkDisplay; i++)
             {
-                pos.Set(newCenterChunk.x - outerLayerOffset + i,
-                        newCenterChunk.y - outerLayerOffset + j, 
-                        newCenterChunk.z - outerLayerOffset);
-                if(isInChunkPosRange(pos)) emptyChunk(chunksMatrix[pos.x, pos.y, pos.z]);
-
-                pos.Set(newCenterChunk.x - outerLayerOffset + i,
-                        newCenterChunk.y - outerLayerOffset + j,
-                        newCenterChunk.z + outerLayerOffset);
-                if(isInChunkPosRange(pos)) emptyChunk(chunksMatrix[pos.x, pos.y, pos.z]);
-
-                pos.Set(newCenterChunk.x - outerLayerOffset + i,
-                        newCenterChunk.y - outerLayerOffset,
-                        newCenterChunk.z - outerLayerOffset + j);
-                if (isInChunkPosRange(pos)) emptyChunk(chunksMatrix[pos.x, pos.y, pos.z]);
-
-                pos.Set(newCenterChunk.x - outerLayerOffset + i,
-                        newCenterChunk.y + outerLayerOffset,
-                        newCenterChunk.z - outerLayerOffset + j);
-                if (isInChunkPosRange(pos)) emptyChunk(chunksMatrix[pos.x, pos.y, pos.z]);
-
-                pos.Set(newCenterChunk.x - outerLayerOffset,
-                    newCenterChunk.y - outerLayerOffset + i,
-                    newCenterChunk.z - outerLayerOffset + j);
-                if (isInChunkPosRange(pos)) emptyChunk(chunksMatrix[pos.x, pos.y, pos.z]);
-
-                pos.Set(newCenterChunk.x + outerLayerOffset,
-                    newCenterChunk.y - outerLayerOffset + i,
-                    newCenterChunk.z - outerLayerOffset + j);
-                if (isInChunkPosRange(pos)) emptyChunk(chunksMatrix[pos.x, pos.y, pos.z]);
-            }
-        }
-
-        // add missing voxels
-        int offset = (int)System.Math.Floor((double)nbChunkDisplay / 2);
-        for (int x = 0; x < nbChunkDisplay; x++)
-        {
-            // do nothing if outside the dataSet
-            if (newCenterChunk.x - offset + x > 0 &&
-                newCenterChunk.x - offset + x < maxChunkPos)
-            {
-                for (int y = 0; y < nbChunkDisplay; y++)
+                for (int j = 0; j < nbChunkDisplay; j++)
                 {
-                    // do nothing if outside the dataSet
-                    if (newCenterChunk.y - offset + y > 0 &&
-                        newCenterChunk.y - offset + y < maxChunkPos)
-                    {
-                        for (int z = 0; z < nbChunkDisplay; z++)
-                        {
-                            // do nothing if outside the dataSet
-                            if (newCenterChunk.z - offset + z > 0 &&
-                                newCenterChunk.z - offset + z < maxChunkPos)
-                            {
-                                // check if the chunk is already there
-                                Vector3Int chunkPos = newCenterChunk + new Vector3Int(x - offset, y - offset, z - offset);
-                                if (chunksMatrix[chunkPos.x, chunkPos.y, chunkPos.z].voxels == null)
-                                {
-                                    chunksMatrix[chunkPos.x, chunkPos.y, chunkPos.z] = populateChunk(dataSet, chunkPos);
-                                }
-                            }
-                        }
+                    pos.Set(oldCenterChunk.x - delta.x * chunkOffset,
+                        oldCenterChunk.y - chunkOffset + i,
+                        oldCenterChunk.z - chunkOffset + j);
+                    if (isInChunkPosRange(pos))
+                    { 
+                        emptyChunk(chunksMatrix[pos.x, pos.y, pos.z]); 
                     }
+
+                    pos.Set(oldCenterChunk.x + delta.x * (chunkOffset + 1),
+                        oldCenterChunk.y - chunkOffset + i,
+                        oldCenterChunk.z - chunkOffset + j);
+                    if(isInChunkPosRange(pos) &&
+                        chunksMatrix[pos.x, pos.y, pos.z].voxels == null)
+                    {
+                        chunksMatrix[pos.x, pos.y, pos.z] = populateChunk(dataSet, pos);
+                    }
+
                 }
             }
         }
+        if (delta.y != 0)
+        {
+            for (int i = 0; i < nbChunkDisplay; i++)
+            {
+                for (int j = 0; j < nbChunkDisplay; j++)
+                {
+                    pos.Set(oldCenterChunk.x - chunkOffset + i,
+                        oldCenterChunk.y - delta.y * chunkOffset,
+                        oldCenterChunk.z - chunkOffset + j);
+                    if (isInChunkPosRange(pos))
+                    {
+                        emptyChunk(chunksMatrix[pos.x, pos.y, pos.z]);
+                    }
+
+                    pos.Set(oldCenterChunk.x - chunkOffset + i,
+                        oldCenterChunk.y + delta.y * (chunkOffset + 1),
+                        oldCenterChunk.z - chunkOffset + j);
+                    if (isInChunkPosRange(pos) &&
+                        chunksMatrix[pos.x, pos.y, pos.z].voxels == null)
+                    {
+                        chunksMatrix[pos.x, pos.y, pos.z] = populateChunk(dataSet, pos);
+                    }
+
+                }
+            }
+        }
+        if (delta.z != 0)
+        {
+            for (int i = 0; i < nbChunkDisplay; i++)
+            {
+                for (int j = 0; j < nbChunkDisplay; j++)
+                {
+                    pos.Set(oldCenterChunk.x - chunkOffset + i,
+                        oldCenterChunk.y - chunkOffset + j,
+                        oldCenterChunk.z - delta.z * chunkOffset);
+                    if (isInChunkPosRange(pos))
+                    {
+                        emptyChunk(chunksMatrix[pos.x, pos.y, pos.z]);
+                    }
+
+                    pos.Set(oldCenterChunk.x - chunkOffset + i,
+                        oldCenterChunk.y - chunkOffset + j,
+                        oldCenterChunk.z + delta.z * (chunkOffset + 1));
+                    if (isInChunkPosRange(pos) &&
+                        chunksMatrix[pos.x, pos.y, pos.z].voxels == null)
+                    {
+                        chunksMatrix[pos.x, pos.y, pos.z] = populateChunk(dataSet, pos);
+                    }
+
+                }
+            }
+        }
+        centerChunk = oldCenterChunk + delta;
     }
+
 
     bool isInChunkPosRange(Vector3Int pos)
     {
