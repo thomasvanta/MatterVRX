@@ -8,6 +8,9 @@ public class OutlineController : MonoBehaviour
 
     private Outline outlineScript;
 
+    public GameObject infoPrefab;
+    private GameObject info = null;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -15,10 +18,21 @@ public class OutlineController : MonoBehaviour
         outlineScript.enabled = false;
     }
 
-    /*
     // Update is called once per frame
-    void Update() {}
-    */
+    void Update()
+    {
+        if (info != null && !outlineScript.enabled)
+        {
+            Destroy(info);
+            info = null;
+        }
+        else if (info == null && outlineScript.enabled)
+        {
+            info = Instantiate(infoPrefab);
+            info.GetComponent<UIFillInfo>().Init(this.transform.position, new UIFillInfo.Voxel() { color = Color.red, scale = 0.2f });
+            info.GetComponent<UIFaceCamera>().SetCamera(Camera.main);
+        }
+    }
 
     public void EnableOutline(bool enabled)
     {
