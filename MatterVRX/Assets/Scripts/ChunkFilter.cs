@@ -100,7 +100,7 @@ public class ChunkFilter : MonoBehaviour
             Transform child = this.transform.GetChild(i);
             child.gameObject.SetActive(false);
         }
-        GetComponent<ChunkGpuInstacing>().displayChunk();
+        //GetComponent<ChunkGpuInstacing>().displayChunk();   no longer valid
     }
 
     private bool GetMenuButton()

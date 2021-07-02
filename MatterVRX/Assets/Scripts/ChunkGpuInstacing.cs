@@ -108,6 +108,7 @@ public class ChunkGpuInstacing : MonoBehaviour
                 {
                     Vector3Int pos = new Vector3Int(chunkPos.x * chunkSize + x, chunkPos.y * chunkSize + y, chunkPos.z * chunkSize + z);
                     
+                    // TODO : a voxel with a size of 0 should not be created
                     Transform t = Instantiate(prefab);
                     t.SetParent(transform);
                     t.localPosition = pos;
@@ -123,6 +124,7 @@ public class ChunkGpuInstacing : MonoBehaviour
 
     void emptyChunk(Chunk chunk)
     {
+        // TODO : some voxels may be empty
         for (int x = 0; x < chunkSize; x++)
         {
             for (int y = 0; y < chunkSize; y++)
@@ -155,6 +157,7 @@ public class ChunkGpuInstacing : MonoBehaviour
 
     Chunk fillChunk(Voxel[,,] dataSet, Chunk[,,] chunksMatrix, Vector3Int pos)
     {
+        // TODO : some voxels may be empty
         if(chunksMatrix[pos.x, pos.y, pos.z].voxels == null)
         {
             return populateChunk(dataSet, pos);
