@@ -6,7 +6,7 @@ public class UIFaceCamera : MonoBehaviour
 {
     public Camera cam = null;
 
-    void LateUpdate()
+    void Update()
     {
         if (cam != null) this.transform.LookAt(cam.transform);
     }
