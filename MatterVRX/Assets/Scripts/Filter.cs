@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
 using UnityEngine.UI;
+using TMPro;
 
 public class Filter : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class Filter : MonoBehaviour
     public SteamVR_Action_Boolean menuButton;
 
     public GameObject dropdownObj;
-    private Dropdown dropdown;
+    private TMP_Dropdown dropdown;
 
     private FilterOn curFilter = FilterOn.None;
 
@@ -27,7 +28,7 @@ public class Filter : MonoBehaviour
     {
         if (dropdownObj != null)
         {
-            dropdown = dropdownObj.transform.GetComponent<Dropdown>();
+            dropdown = dropdownObj.transform.GetComponent<TMP_Dropdown>();
             dropdown.onValueChanged.AddListener(delegate { FilterDropdown(dropdown); });
         }
     }
@@ -87,7 +88,7 @@ public class Filter : MonoBehaviour
         return menuButton.GetStateDown(handType);
     }
 
-    private void FilterDropdown(Dropdown dd)
+    private void FilterDropdown(TMP_Dropdown dd)
     {
         int i = dd.value;
 
