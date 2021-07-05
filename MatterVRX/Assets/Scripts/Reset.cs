@@ -19,8 +19,7 @@ public class Reset : MonoBehaviour
     {
         if (GetLeftPad() || GetRightPad())
         {
-            this.transform.position = Vector3.zero;
-            this.transform.localScale = Vector3.one;
+            DoReset();
         }
     }
 
@@ -32,5 +31,11 @@ public class Reset : MonoBehaviour
     public bool GetRightPad()
     {
         return clickPad.GetStateDown(rightHandType);
+    }
+
+    public void DoReset()
+    {
+        this.transform.position = Vector3.zero;
+        this.transform.localScale = Vector3.one;
     }
 }

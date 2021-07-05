@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
+using UnityEngine.UI;
 
 public class Filter : MonoBehaviour
 {
@@ -15,17 +16,27 @@ public class Filter : MonoBehaviour
     public SteamVR_Input_Sources handType;
     public SteamVR_Action_Boolean menuButton;
 
+    public GameObject dropdownObj;
+    private Dropdown dropdown;
+
     private FilterOn curFilter = FilterOn.None;
 
-    /*
+
     // Start is called before the first frame update
-    void Start() { }
-    */
+    void Start()
+    {
+        if (dropdownObj != null)
+        {
+            dropdown = dropdownObj.transform.GetComponent<Dropdown>();
+            dropdown.onValueChanged.AddListener(delegate { FilterDropdown(dropdown); });
+        }
+    }
+
 
     // Update is called once per frame
     void Update() 
     {
-        if(GetMenuButton())
+        if (GetMenuButton())
         {
             if(curFilter == FilterOn.None)
             {
@@ -74,5 +85,17 @@ public class Filter : MonoBehaviour
     private bool GetMenuButton()
     {
         return menuButton.GetStateDown(handType);
+    }
+
+    private void FilterDropdown(Dropdown dd)
+    {
+        int i = dd.value;
+
+        if (typeof(FilterOn).IsEnumDefined(i))
+        {
+            FilterOn filter = (FilterOn)i;
+            FilterVoxels(filter);
+            curFilter = filter;
+        }
     }
 }
