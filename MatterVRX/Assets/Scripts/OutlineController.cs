@@ -29,8 +29,10 @@ public class OutlineController : MonoBehaviour
         {
             info = Instantiate(infoPrefab);
             info.GetComponent<UIFillInfo>().Init(this.transform.position, new UIFillInfo.Voxel() { color = Color.red, scale = 0.2f });
-            info.GetComponent<UIFaceCamera>().cam = camera;
-            info.transform.position = this.transform.position + new Vector3(0, 0, 1);
+
+            UIFaceCamera faceCam = info.GetComponent<UIFaceCamera>();
+            faceCam.cam = camera;
+            faceCam.parentPosition = this.transform.position;
         }
     }
 
