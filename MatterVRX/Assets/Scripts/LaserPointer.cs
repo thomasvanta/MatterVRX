@@ -9,6 +9,9 @@ public class LaserPointer : MonoBehaviour
     public SteamVR_Behaviour_Pose controllerPose;
     public SteamVR_Action_Boolean grabGrip;
 
+    public GameObject sphereSelectorPrefab;
+    private Selector sphereSelector;
+
     public GameObject laserPrefab;
     private GameObject laser;
     private Transform laserTransform;
@@ -21,6 +24,11 @@ public class LaserPointer : MonoBehaviour
     {
         laser = Instantiate(laserPrefab);
         laserTransform = laser.transform;
+
+        GameObject go = Instantiate(sphereSelectorPrefab);
+        sphereSelector = go.GetComponent<Selector>();
+        sphereSelector.handType = handType;
+        sphereSelector.controllerPose = controllerPose;
     }
 
     // Update is called once per frame
@@ -44,6 +52,7 @@ public class LaserPointer : MonoBehaviour
                 if (GetGrabGrip())
                 {
                     ctrl.ToggleSelected();
+                    sphereSelector.StartGrabbing(hitPoint);
                 }
             }
             prevHit = hit.collider.gameObject;

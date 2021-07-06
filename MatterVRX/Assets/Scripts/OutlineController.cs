@@ -41,6 +41,23 @@ public class OutlineController : MonoBehaviour
         }
     }
 
+    public void Select(bool s)
+    {
+        selected = s;
+        if (selected)
+        {
+            EnableOutline(true);
+            outlineScript.OutlineColor = Color.red; //new Color(255, 140, 0); // orange
+            outlineScript.OutlineMode = Outline.Mode.OutlineAndSilhouette;
+        }
+        else
+        {
+            EnableOutline(false);
+            outlineScript.OutlineColor = Color.white;
+            outlineScript.OutlineMode = Outline.Mode.OutlineVisible;
+        }
+    }
+
     public bool GetSelected()
     {
         return selected;
