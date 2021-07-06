@@ -9,11 +9,17 @@ public class InfoController : MonoBehaviour
     public GameObject infoPrefab;
     private GameObject info = null;
 
+    private bool showInfo = true;
+
+    private ToggleInfoEvent infoEvent;
+
     // Start is called before the first frame update
     void Start()
     {
         outlineScript = GetComponent<Outline>();
         outlineScript.enabled = false;
+
+        infoEvent = this.transform.parent.GetComponent<ToggleInfoEvent>();
     }
 
     public void UpdateInfo(Camera camera)
@@ -22,6 +28,8 @@ public class InfoController : MonoBehaviour
         {
             Destroy(info);
             info = null;
+
+            infoEvent.onToggleInfo -= ToggleInfo;
         }
         else if (info == null && outlineScript.enabled)
         {
@@ -32,6 +40,18 @@ public class InfoController : MonoBehaviour
 
             UIFaceCamera faceCam = info.GetComponent<UIFaceCamera>();
             faceCam.cam = camera;
+
+            showInfo = infoEvent.infoOn;
+            info.SetActive(showInfo);
+
+            infoEvent.onToggleInfo += ToggleInfo;
         }
+    }
+
+    public void ToggleInfo()
+    {
+        bool on = infoEvent.infoOn;
+        showInfo = on;
+        if (info != null) info.SetActive(on);
     }
 }
