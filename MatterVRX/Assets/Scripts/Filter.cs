@@ -17,8 +17,7 @@ public class Filter : MonoBehaviour
     public SteamVR_Input_Sources handType;
     public SteamVR_Action_Boolean menuButton;
 
-    public GameObject dropdownObj;
-    private TMP_Dropdown dropdown;
+    public TMP_Dropdown dropdown;
 
     private FilterOn curFilter = FilterOn.None;
 
@@ -26,9 +25,8 @@ public class Filter : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (dropdownObj != null)
+        if (dropdown != null)
         {
-            dropdown = dropdownObj.transform.GetComponent<TMP_Dropdown>();
             dropdown.onValueChanged.AddListener(delegate { FilterDropdown(dropdown); });
         }
     }

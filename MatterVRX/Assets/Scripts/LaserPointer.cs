@@ -39,7 +39,7 @@ public class LaserPointer : MonoBehaviour
                 if (prevCtrl != null)
                 {
                     prevCtrl.EnableOutline(false);
-                    prevCtrl.UpdateInfo(cam);
+                    prevHit.GetComponent<InfoController>().UpdateInfo(cam);
                 }
             }
 
@@ -48,7 +48,7 @@ public class LaserPointer : MonoBehaviour
             if (ctrl != null)
             {
                 ctrl.EnableOutline(true);
-                ctrl.UpdateInfo(cam);
+                hit.collider.gameObject.GetComponent<InfoController>().UpdateInfo(cam);
                 if (GetGrabGrip())
                 {
                     ctrl.ToggleSelected();
@@ -66,7 +66,7 @@ public class LaserPointer : MonoBehaviour
                 if (prevCtrl != null)
                 {
                     prevCtrl.EnableOutline(false);
-                    prevCtrl.UpdateInfo(cam);
+                    prevHit.GetComponent<InfoController>().UpdateInfo(cam);
                 }
                 prevHit = null;
             }
