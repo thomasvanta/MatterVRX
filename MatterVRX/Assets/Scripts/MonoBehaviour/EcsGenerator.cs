@@ -11,6 +11,8 @@ public class EcsGenerator : MonoBehaviour
 {
 
     [SerializeField] private int size = 10;
+    [SerializeField] private float minScale = 0.05f;
+    [SerializeField] private float maxScale = 0.5f;
     [SerializeField] private Mesh mesh;
     [SerializeField] private Material material;
 
@@ -29,9 +31,11 @@ public class EcsGenerator : MonoBehaviour
 
         EntityArchetype entityArchetype = entityManager.CreateArchetype(
             typeof(Translation),
+            typeof(Scale),
             typeof(RenderMesh),
             typeof(LocalToWorld),
-            typeof(MaterialColor)
+            typeof(CustomColor),
+            typeof(RenderBounds)
             );
 
         NativeArray<Entity> entities = new NativeArray<Entity>(size * size * size, Allocator.Temp);
@@ -45,9 +49,10 @@ public class EcsGenerator : MonoBehaviour
                 for (int z = 0; z < size; z++)
                 {
                     Entity entity = entities[x + y * size + z * size2];
-                    Vector4 color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-                    entityManager.SetComponentData(entity, new MaterialColor {Value = color });
+                    Color color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+                    entityManager.SetComponentData(entity, new CustomColor { value = color });
                     entityManager.SetComponentData(entity, new Translation { Value = new float3(x, y, z) });
+                    entityManager.SetComponentData(entity, new Scale { Value = UnityEngine.Random.Range(minScale, maxScale) });
 
                     entityManager.SetSharedComponentData(entity, new RenderMesh
                     {
