@@ -14,6 +14,8 @@ public class RandomGen : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Vector3Int[,,] lines = DataReader.ReadStreamlines(30, "output-0000003.txt");
+
         for(int x = 0; x < size;  x++)
         {
             for (int y = 0; y < size; y++)
@@ -24,7 +26,16 @@ public class RandomGen : MonoBehaviour
                     sphere.GetComponent<VisualManager>().SetColor(Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f));
                     sphere.transform.parent = this.transform;
                     sphere.transform.position = new Vector3(x, y, z);
-                    sphere.GetComponent<VisualManager>().SetScale(Random.Range(minScale, maxScale));
+                    float randScale = Random.Range(minScale, maxScale);
+                    sphere.GetComponent<VisualManager>().SetScale(randScale);
+
+                    Vector3Int lineVector = lines[x, y, z];
+                    if (lineVector != null && lineVector != Vector3Int.zero)
+                    {
+                        LineRenderer line = sphere.GetComponent<LineRenderer>();
+                        line.enabled = true;
+                        line.SetPositions(new Vector3[] { Vector3.zero, new Vector3(lineVector.x, lineVector.y, lineVector.z) / randScale });
+                    }
                 }
             }
         } 
