@@ -1,0 +1,16 @@
+{
+  "source": "Unity",
+  "applications": [
+    {
+      "app_key": "application.generated.unity.ecsmattervrx.exe",
+      "launch_type": "url",
+      "url": "steam://launch/",
+      "action_manifest_path": "D:\\Dev info\\Projets\\Unity\\Stage 2A\\MatterVRX\\ECS MatterVRX\\Assets\\StreamingAssets\\SteamVR\\actions.json",
+      "strings": {
+        "en_us": {
+          "name": "ECS MatterVRX [Testing]"
+        }
+      }
+    }
+  ]
+}
