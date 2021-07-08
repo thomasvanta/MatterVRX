@@ -49,7 +49,7 @@ public class EcsGenerator : MonoBehaviour
                 for (int z = 0; z < size; z++)
                 {
                     Entity entity = entities[x + y * size + z * size2];
-                    Color color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+                    Vector4 color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
                     entityManager.SetComponentData(entity, new CustomColor { value = color });
                     entityManager.SetComponentData(entity, new Translation { Value = new float3(x, y, z) });
                     entityManager.SetComponentData(entity, new Scale { Value = UnityEngine.Random.Range(minScale, maxScale) });

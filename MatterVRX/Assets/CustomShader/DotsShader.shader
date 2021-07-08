@@ -37,14 +37,13 @@ Shader "Unlit/DotsShader"
             CBUFFER_START(UnityPerMaterial)
                 float4 _Color;
             CBUFFER_END
-            #if defined(UNITY_DOTS_INSTANCING_ENABLED)
-                // DOTS instancing definitions
-                UNITY_DOTS_INSTANCING_START(MaterialPropertyMetadata)
-                UNITY_DOTS_INSTANCED_PROP(float4, _Color)
-                UNITY_DOTS_INSTANCING_END(MaterialPropertyMetadata)
-                // DOTS instancing usage macros
-            #define _Color UNITY_ACCESS_DOTS_INSTANCED_PROP_FROM_MACRO(float4, Metadata__Color)
-            #endif
+            // DOTS instancing definitions
+            UNITY_DOTS_INSTANCING_START(MaterialPropertyMetadata)
+            UNITY_DOTS_INSTANCED_PROP(float4, _Color)
+            UNITY_DOTS_INSTANCING_END(MaterialPropertyMetadata)
+            // DOTS instancing usage macros
+            _Color UNITY_ACCESS_DOTS_INSTANCED_PROP_FROM_MACRO(float4, Metadata__Color)
+
 
             v2f vert (appdata v)
             {

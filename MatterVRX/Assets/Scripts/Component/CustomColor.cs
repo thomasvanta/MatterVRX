@@ -12,5 +12,5 @@ using Unity.Rendering;
 
 public struct CustomColor : IComponentData
 {
-    public Color value;
+    public float4 value;
 }
