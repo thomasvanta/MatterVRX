@@ -2,17 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Entities;
-using Unity.Transforms;
 using Unity.Rendering;
-using Unity.Collections;
 using Unity.Mathematics;
+using Unity.Transforms;
+using Unity.Collections;
 
 public class EcsSpawnerRandom : MonoBehaviour
 {
-
     [SerializeField] private int size = 10;
-    [SerializeField] private float minScale = 0.05f;
-    [SerializeField] private float maxScale = 0.5f;
+    [SerializeField] private float minSize = 0.05f;
+    [SerializeField] private float maxSize = 0.5f;
     [SerializeField] private Mesh mesh;
     [SerializeField] private Material material;
 
@@ -22,22 +21,20 @@ public class EcsSpawnerRandom : MonoBehaviour
         randomGen();
     }
 
-    private void randomGen()
+    void randomGen()
     {
-
         EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
-        EntityArchetype entityArchetype = entityManager.CreateArchetype(
+        EntityArchetype voxel = entityManager.CreateArchetype(
             typeof(Translation),
             typeof(Scale),
             typeof(RenderMesh),
             typeof(LocalToWorld),
-            typeof(CustomColor),
-            typeof(RenderBounds)
-            );
+            typeof(RenderBounds),
+            typeof(CustomColor));
 
         NativeArray<Entity> entities = new NativeArray<Entity>(size * size * size, Allocator.Temp);
-        entityManager.CreateEntity(entityArchetype, entities);
+        entityManager.CreateEntity(voxel, entities);
 
         int size2 = size * size;
         for (int x = 0; x < size; x++)
@@ -47,10 +44,11 @@ public class EcsSpawnerRandom : MonoBehaviour
                 for (int z = 0; z < size; z++)
                 {
                     Entity entity = entities[x + y * size + z * size2];
+                    entityManager.SetComponentData(entity, new Translation { Value = new float3(x, y, z) });
+                    
                     Vector4 color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
                     entityManager.SetComponentData(entity, new CustomColor { value = color });
-                    entityManager.SetComponentData(entity, new Translation { Value = new float3(x, y, z) });
-                    entityManager.SetComponentData(entity, new Scale { Value = UnityEngine.Random.Range(minScale, maxScale) });
+                    entityManager.SetComponentData(entity, new Scale { Value = UnityEngine.Random.Range(minSize, maxSize) });
 
                     entityManager.SetSharedComponentData(entity, new RenderMesh
                     {
@@ -60,7 +58,7 @@ public class EcsSpawnerRandom : MonoBehaviour
                 }
             }
         }
-
         entities.Dispose();
     }
+
 }
