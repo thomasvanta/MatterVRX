@@ -31,7 +31,7 @@ public class EcsSpawnerRandom : MonoBehaviour
             typeof(RenderMesh),
             typeof(LocalToWorld),
             typeof(RenderBounds),
-            typeof(MainColorComponent),
+            typeof(MainColorComponent)
             //typeof(PhysicsCollider)
             );
 
