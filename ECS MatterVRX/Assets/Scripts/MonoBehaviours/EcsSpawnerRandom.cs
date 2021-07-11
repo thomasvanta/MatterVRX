@@ -4,6 +4,7 @@ using Unity.Rendering;
 using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Collections;
+using Unity.Physics;
 
 public class EcsSpawnerRandom : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public class EcsSpawnerRandom : MonoBehaviour
     [SerializeField] private float minSize = 0.05f;
     [SerializeField] private float maxSize = 0.5f;
     [SerializeField] private Mesh mesh;
-    [SerializeField] private Material material;
+    [SerializeField] private UnityEngine.Material material;
 
     // Start is called before the first frame update
     void Start()
@@ -30,7 +31,9 @@ public class EcsSpawnerRandom : MonoBehaviour
             typeof(RenderMesh),
             typeof(LocalToWorld),
             typeof(RenderBounds),
-            typeof(MainColorComponent));
+            typeof(MainColorComponent),
+            //typeof(PhysicsCollider)
+            );
 
         NativeArray<Entity> entities = new NativeArray<Entity>(size * size * size, Allocator.Temp);
         entityManager.CreateEntity(voxelArchetype, entities);
@@ -47,7 +50,19 @@ public class EcsSpawnerRandom : MonoBehaviour
                     
                     Vector4 color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
                     entityManager.SetComponentData(entity, new MainColorComponent { value = color });
-                    entityManager.SetComponentData(entity, new Scale { Value = UnityEngine.Random.Range(minSize, maxSize) });
+
+                    float scale = UnityEngine.Random.Range(minSize, maxSize);
+                    entityManager.SetComponentData(entity, new Scale { Value = scale });
+
+                    //BlobAssetReference<Unity.Physics.Collider> collider = Unity.Physics.BoxCollider.Create(new BoxGeometry
+                    //{
+                    //    Center = new float3(x, y, z),
+                    //    Orientation = quaternion.identity,
+                    //    Size = new float3(scale, scale, scale),
+                    //    BevelRadius = 0.05f
+                    //});
+                    //PhysicsCollider colliderComponent = new PhysicsCollider { Value = collider };
+                    //entityManager.SetComponentData(entity, colliderComponent);
 
                     entityManager.SetSharedComponentData(entity, new RenderMesh
                     {
