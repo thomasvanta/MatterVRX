@@ -15,8 +15,8 @@ public class HorizontalMovement : MonoBehaviour // left hand for horizontal move
     {
         Vector2 v = GetDirection();
 
-        InputManager.xAxis = (playerCamera.transform.forward.x * v.y + playerCamera.transform.right.x * v.x) * horizontalSpeed;
-        InputManager.zAxis = (playerCamera.transform.forward.z * v.y + playerCamera.transform.right.z * v.x) * horizontalSpeed;
+        InputManager.direction.x = (playerCamera.transform.forward.x * v.y + playerCamera.transform.right.x * v.x) * horizontalSpeed;
+        InputManager.direction.z = (playerCamera.transform.forward.z * v.y + playerCamera.transform.right.z * v.x) * horizontalSpeed;
     }
 
     public Vector2 GetDirection()

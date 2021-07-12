@@ -1,5 +1,6 @@
 using UnityEngine;
 using Valve.VR;
+using Unity.Mathematics;
 
 public class Zoom : MonoBehaviour
 {
@@ -18,9 +19,7 @@ public class Zoom : MonoBehaviour
 
     void Start()
     {
-        InputManager.zoomPivotX = 0;
-        InputManager.zoomPivotY = 0;
-        InputManager.zoomPivotZ = 0;
+        InputManager.zoomPivot = float3.zero ;
         InputManager.zoomFactor = 1;
     }
 
@@ -41,11 +40,7 @@ public class Zoom : MonoBehaviour
 
             float scale = ((newOffset.sqrMagnitude / offset.sqrMagnitude) - 1) * zoomFactor + 1;
 
-            Vector3 pivot = userHead.transform.position + zoomCenterOffset * userHead.transform.forward;
-
-            InputManager.zoomPivotX = pivot.x;
-            InputManager.zoomPivotY = pivot.y;
-            InputManager.zoomPivotZ = pivot.z;
+            InputManager.zoomPivot = userHead.transform.position + zoomCenterOffset * userHead.transform.forward;
             InputManager.zoomFactor =  scale;
 
             offset = newOffset;

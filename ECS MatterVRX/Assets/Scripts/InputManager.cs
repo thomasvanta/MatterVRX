@@ -1,14 +1,13 @@
+using Unity.Mathematics;
 public static class InputManager
 {
     //Movement
-    public static float xAxis;
-    public static float yAxis;
-    public static float zAxis;
+    public static float3 direction;
+
 
     //Zoom
     public static float zoomFactor;
-    public static float zoomPivotX;
-    public static float zoomPivotY;
-    public static float zoomPivotZ;
+    public static float3 zoomPivot;
+
 
 }
