@@ -8,7 +8,7 @@ public class ZoomSystem : JobComponentSystem
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
         /*
-        float3 pivot = new float3(InputManager.zoomPivotX, InputManager.zoomPivotY, InputManager.zoomPivotZ);
+        float3 pivot = InputManager.zoomPivot;
         float zoomFactor = InputManager.zoomFactor;
         float deltaTime = Time.DeltaTime;
         */
