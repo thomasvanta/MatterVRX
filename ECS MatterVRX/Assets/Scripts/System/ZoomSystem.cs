@@ -7,17 +7,17 @@ public class ZoomSystem : JobComponentSystem
 {
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
-        /*
+
         float3 pivot = InputManager.zoomPivot;
         float zoomFactor = InputManager.zoomFactor;
-        float deltaTime = Time.DeltaTime;
-        */
 
-        JobHandle jobHandle = Entities.ForEach((ref Translation translation, in VoxelFlag flag) => {
-            /*
+
+        JobHandle jobHandle = Entities.ForEach((ref Translation translation, ref Scale scale, in VoxelFlag flag) => {
+
             float3 delta = translation.Value - pivot;
-            translation.Value = pivot + delta * zoomFactor * deltaTime; 
-            */
+            translation.Value = pivot + delta * zoomFactor;
+            scale.Value *= zoomFactor;
+
         }).Schedule(inputDeps);
 
         return jobHandle;

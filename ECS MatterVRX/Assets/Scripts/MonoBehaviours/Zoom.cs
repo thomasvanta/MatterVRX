@@ -17,9 +17,9 @@ public class Zoom : MonoBehaviour
 
     private Vector3 offset;
 
-    void Start()
+    private void Start()
     {
-        InputManager.zoomPivot = float3.zero ;
+        InputManager.zoomPivot = float3.zero;
         InputManager.zoomFactor = 1;
     }
 
@@ -41,11 +41,16 @@ public class Zoom : MonoBehaviour
             float scale = ((newOffset.sqrMagnitude / offset.sqrMagnitude) - 1) * zoomFactor + 1;
 
             InputManager.zoomPivot = userHead.transform.position + zoomCenterOffset * userHead.transform.forward;
-            InputManager.zoomFactor =  scale;
+            InputManager.zoomFactor = scale;
 
             offset = newOffset;
         }
-        else offset = Vector3.zero;
+        else
+        {
+            offset = Vector3.zero;
+            InputManager.zoomPivot = float3.zero;
+            InputManager.zoomFactor = 1;
+        }
     }
 
 
