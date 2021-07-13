@@ -5,6 +5,7 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Collections;
 using Unity.Physics;
+using E7.ECS.LineRenderer;
 
 public class EcsSpawnerRandom : MonoBehaviour
 {
@@ -72,6 +73,11 @@ public class EcsSpawnerRandom : MonoBehaviour
                 }
             }
         }
+
+        var e = entityManager.CreateEntity();
+        entityManager.AddComponentData(e, new LineSegment(math.float3(-1, -1, -1), math.float3(-1, 6, -1)));
+        entityManager.AddSharedComponentData(e, new LineStyle { material = material });
+
         entities.Dispose();
     }
 
