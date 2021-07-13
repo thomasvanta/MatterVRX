@@ -32,11 +32,12 @@ namespace E7.ECS.LineRenderer
 
         protected override JobHandle OnUpdate(JobHandle inputDeps)
         {
-            var cameraAca = billboardCameraQuery.CreateArchetypeChunkArray(Allocator.TempJob);
+            //var cameraAca = billboardCameraQuery.CreateArchetypeChunkArray(Allocator.TempJob);
 
             var linePositioningJobHandle = new LinePositioningJob
             {
-                cameraAca = cameraAca,
+                //cameraAca = cameraAca,
+                cameraPos = InputManager.camPos,
                 lastSystemVersion = LastSystemVersion,
                 lineSegmentType = GetComponentTypeHandle<LineSegment>(isReadOnly: true),
                 ltwType = GetComponentTypeHandle<LocalToWorld>(isReadOnly: true),
@@ -51,7 +52,8 @@ namespace E7.ECS.LineRenderer
         [BurstCompile]
         struct LinePositioningJob : IJobChunk
         {
-            [DeallocateOnJobCompletion] public NativeArray<ArchetypeChunk> cameraAca;
+            //[DeallocateOnJobCompletion] public NativeArray<ArchetypeChunk> cameraAca;
+            public float3 cameraPos;
             [ReadOnly] public ComponentTypeHandle<LineSegment> lineSegmentType;
             public uint lastSystemVersion;
 
@@ -65,10 +67,10 @@ namespace E7.ECS.LineRenderer
             {
                 //Do not commit to change if possible
 
-                bool lineChunkChanged = ac.DidChange(lineSegmentType, lastSystemVersion);
-                bool cameraMovedOrRotated = cameraAca.Length != 0 && cameraAca[0].DidChange(ltwType, lastSystemVersion);
+                //bool lineChunkChanged = ac.DidChange(lineSegmentType, lastSystemVersion);
+                //bool cameraMovedOrRotated = cameraAca.Length != 0 && cameraAca[0].DidChange(ltwType, lastSystemVersion);
 
-                if (!lineChunkChanged && !cameraMovedOrRotated) return;
+                //if (!lineChunkChanged && !cameraMovedOrRotated) return;
 
                 //These gets will commit a version bump
                 var segs = ac.GetNativeArray(lineSegmentType);
@@ -98,33 +100,33 @@ namespace E7.ECS.LineRenderer
                     //Billboard rotation
 
                     quaternion rotation = quaternion.identity;
-                    if (cameraAca.Length != 0)
-                    {
-                        var cameraTranslations = cameraAca[0].GetNativeArray(ltwType);
+                    //if (cameraAca.Length != 0)
+                    //{
+                        //var cameraTranslations = cameraAca[0].GetNativeArray(ltwType);
 
                         //TODO: Better support for multiple cameras. It would be via `alignWithCamera` on the LineStyle?
 
-                        var cameraRigid = math.RigidTransform(cameraTranslations[0].Value);
-                        var cameraTranslation = cameraRigid.pos;
+                        //var cameraRigid = math.RigidTransform(cameraTranslations[0].Value);
+                        //var cameraTranslation = cameraRigid.pos;
                         
                         //TODO : use this somehow? Currently billboard is wrong.
                         // If anyone understand http://www.opengl-tutorial.org/intermediate-tutorials/billboards-particles/billboards/
                         // please tell me how to do this..
-                        var cameraRotation = cameraRigid.rot; 
+                        //var cameraRotation = cameraRigid.rot; 
 
-                        float3 toCamera = math.normalize(cameraTranslation - seg.from);
+                    float3 toCamera = math.normalize(cameraPos - seg.from);
 
-                        //If forward and toCamera is collinear the cross product is 0
-                        //and it will gives quaternion with tons of NaN
-                        //So we rather do nothing if that is the case
-                        if ((seg.from.Equals(cameraTranslation) ||
-                             math.cross(forwardUnit, toCamera).Equals(float3.zero)) == false)
-                        {
-                            //This is wrong because it only taken account of the camera's position, not also its rotation.
-                            rotation = quaternion.LookRotation(forwardUnit, toCamera);
-                            //Debug.Log($"ROTATING {rotation} to {cameraTranslation}");
-                        }
+                    //If forward and toCamera is collinear the cross product is 0
+                    //and it will gives quaternion with tons of NaN
+                    //So we rather do nothing if that is the case
+                    if ((seg.from.Equals(cameraPos) ||
+                            math.cross(forwardUnit, toCamera).Equals(float3.zero)) == false)
+                    {
+                        //This is wrong because it only taken account of the camera's position, not also its rotation.
+                        rotation = quaternion.LookRotation(forwardUnit, toCamera);
+                        //Debug.Log($"ROTATING {rotation} to {cameraTranslation}");
                     }
+                    //}
 
                     trans[i] = new Translation {Value = seg.from};
                     rots[i] = new Rotation {Value = rotation};
