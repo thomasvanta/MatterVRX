@@ -31,8 +31,10 @@ public class EcsSpawnerRandom : MonoBehaviour
             typeof(RenderMesh),
             typeof(LocalToWorld),
             typeof(RenderBounds),
-            typeof(MainColorComponent)
-            //typeof(PhysicsCollider)
+            typeof(MainColorComponent),
+            typeof(OutlineColorComponent),
+            typeof(OutlineComponent)
+            ,typeof(PhysicsCollider)
             );
 
         NativeArray<Entity> entities = new NativeArray<Entity>(size * size * size, Allocator.Temp);
@@ -50,19 +52,21 @@ public class EcsSpawnerRandom : MonoBehaviour
                     
                     Vector4 color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
                     entityManager.SetComponentData(entity, new MainColorComponent { value = color });
+                    entityManager.SetComponentData(entity, new OutlineColorComponent { value = new float4(0, 0, 0, 1) });
 
                     float scale = UnityEngine.Random.Range(minSize, maxSize);
                     entityManager.SetComponentData(entity, new Scale { Value = scale });
 
-                    //BlobAssetReference<Unity.Physics.Collider> collider = Unity.Physics.BoxCollider.Create(new BoxGeometry
-                    //{
-                    //    Center = new float3(x, y, z),
-                    //    Orientation = quaternion.identity,
-                    //    Size = new float3(scale, scale, scale),
-                    //    BevelRadius = 0.05f
-                    //});
-                    //PhysicsCollider colliderComponent = new PhysicsCollider { Value = collider };
-                    //entityManager.SetComponentData(entity, colliderComponent);
+                    entityManager.SetComponentData(entity, new OutlineComponent { isSelected = false, color = new float4(1, 1, 1, 1) });
+                    
+                    BoxGeometry box = new BoxGeometry
+                    {
+                        Center = float3.zero,
+                        Orientation = quaternion.identity,
+                        Size = new float3(scale,scale,scale)
+                    };
+                    entityManager.SetComponentData(entity, new PhysicsCollider { Value = Unity.Physics.BoxCollider.Create(box) } );
+                    
 
                     entityManager.SetSharedComponentData(entity, new RenderMesh
                     {
@@ -74,5 +78,4 @@ public class EcsSpawnerRandom : MonoBehaviour
         }
         entities.Dispose();
     }
-
 }

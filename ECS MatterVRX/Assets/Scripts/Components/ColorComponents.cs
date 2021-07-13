@@ -10,3 +10,10 @@ public struct MainColorComponent : IComponentData
 {
     public float4 value;
 }
+
+[Serializable]
+[MaterialProperty("_Outline", MaterialPropertyFormat.Float4)]
+public struct OutlineColorComponent : IComponentData
+{
+    public float4 value;
+}
