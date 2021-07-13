@@ -36,4 +36,25 @@ public static class DataReader
 
         return lines;
     }
+
+    public static int[,] ReadAdjacencyMatrix(string fileName, int size = 84)
+    {
+        int[,] matrix = new int[84, 84];
+        char fieldSeparator = ',';
+        string path = "Assets/Resources/" + fileName;
+        StreamReader reader = new StreamReader(path);
+
+        for (int i = 0; i < size; i++)
+        {
+            string[] fields = reader.ReadLine().Split(fieldSeparator);
+            for (int j = i; j < size; j++)
+            {
+                int val = int.Parse(fields[j]);
+                matrix[i, j] = val;
+                matrix[j, i] = val;
+            }
+        }
+
+        return matrix;
+    }
 }
