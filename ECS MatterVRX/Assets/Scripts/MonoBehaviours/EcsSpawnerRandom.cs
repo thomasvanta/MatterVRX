@@ -75,10 +75,8 @@ public class EcsSpawnerRandom : MonoBehaviour
             }
         }
 
-        //Debug.Log(DataReader.ReadAdjacencyMatrix("connectome_1M.csv"));
-
         Vector3Int v3i;
-        List<Vector3Int> list = DataReader.ReadStreamline(out v3i, "fake-output.txt");
+        List<Vector3Int> list = DataReader.ReadStreamlineInt(out v3i, "fake-output.txt");
         float3 v = new float3(v3i.x, v3i.y, v3i.z);
 
         foreach (Vector3Int dv3i in list)
@@ -91,6 +89,8 @@ public class EcsSpawnerRandom : MonoBehaviour
 
             v += dv;
         }
+
+        DataReader.PrintParsed();
 
         entities.Dispose();
     }
