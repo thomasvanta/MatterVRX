@@ -12,6 +12,8 @@ public class Raycast : MonoBehaviour
     [SerializeField] private SteamVR_Behaviour_Pose pose;
     [SerializeField] private SteamVR_Input_Sources handType;
 
+    private Entity lastEntity = Entity.Null;
+    private EntityManager entityManager;
     private Entity DoRaycast(float3 from, float3 to)
     {
         BuildPhysicsWorld buildPhysicsWorld = World.DefaultGameObjectInjectionWorld.GetExistingSystem<BuildPhysicsWorld>();
@@ -42,13 +44,28 @@ public class Raycast : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+    }
+
     private void Update()
     {
         Entity hit = DoRaycast(pose.transform.position, 100f * pose.transform.forward + pose.transform.position);
 
-        if (hit != Entity.Null)
+        if (hit == Entity.Null && lastEntity != Entity.Null)
         {
-            Debug.Log("hit");
+            entityManager.SetComponentData(lastEntity, new OutlineComponent { isSelected = false });
+            lastEntity = Entity.Null;
+        }
+        else if (hit != Entity.Null && lastEntity != hit)
+        {
+            if (lastEntity != Entity.Null)
+            {
+                entityManager.SetComponentData(lastEntity, new OutlineComponent { isSelected = false });
+            }
+            entityManager.SetComponentData(hit, new OutlineComponent { isSelected = true, color = new float4(1, 1, 1, 1) });
+            lastEntity = hit;
         }
     }
 }
