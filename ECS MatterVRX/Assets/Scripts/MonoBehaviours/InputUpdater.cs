@@ -4,7 +4,7 @@ using Unity.Mathematics;
 public class InputUpdater : MonoBehaviour
 {
     [SerializeField] private Camera user;
-    [SerializeField] private float colliderDist = 50;
+    [SerializeField] private float colliderDist = 10;
 
     // Start is called before the first frame update
     void Start()

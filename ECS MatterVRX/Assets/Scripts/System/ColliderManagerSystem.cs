@@ -6,75 +6,94 @@ using Unity.Physics;
 using Unity.Collections;
 
 
-/*
-public class AddColliderSystem : JobComponentSystem
+public class AddColliderSystem : ComponentSystem
 {
-    EntityCommandBufferSystem entityCommandBufferSystem;
-
+    EntityQuery query;
     protected override void OnCreate()
     {
+        var queryDesc = new EntityQueryDesc
+        {
+            None = new ComponentType[] { ComponentType.ReadOnly<PhysicsCollider>() },
+            All = new ComponentType[]
+            {
+                ComponentType.ReadOnly<VoxelFlag>(),
+                ComponentType.ReadOnly<Translation>(),
+                ComponentType.ReadOnly<Scale>()
+            }
+        };
+        query = GetEntityQuery(queryDesc);
         base.OnCreate();
-        entityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
     }
 
-    protected override JobHandle OnUpdate(JobHandle inputDeps)
+    protected override void OnUpdate()
     {
         float3 userPos = InputManager.userPos;
         float dist = InputManager.colliderDist;
 
-        var entityCommandBuffer = entityCommandBufferSystem.CreateCommandBuffer().AsParallelWriter();
+        NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
+        NativeArray<Translation> positions = query.ToComponentDataArray<Translation>(Allocator.Temp);
+        NativeArray<Scale> scales = query.ToComponentDataArray<Scale>(Allocator.Temp);
 
-        JobHandle jobHandle = Entities
-            .WithAll<VoxelFlag>()
-            .WithNone<PhysicsCollider>()
-            .ForEach((Entity entity, int index, in Translation pos, in Scale scale) => {
-                if (math.distance(pos.Value, userPos) < dist)
+        for (int i = 0; i < entities.Length; i++)
+        {
+            if (math.distance(positions[i].Value, userPos) < dist)
+            {
+                
+                BoxGeometry box = new BoxGeometry
                 {
-                    
-                    BoxGeometry box = new BoxGeometry
-                    {
-                        Center = float3.zero,
-                        Orientation = quaternion.identity,
-                        Size = new float3(scale.Value, scale.Value, scale.Value)
-                    };
-                    entityCommandBuffer.AddComponent(index, entity, new PhysicsCollider { Value = Unity.Physics.BoxCollider.Create(box) });
-                }
-        }).Schedule(inputDeps);
+                    Center = float3.zero,
+                    Orientation = quaternion.identity,
+                    Size = new float3(scales[i].Value)
+                };
+                PostUpdateCommands.AddComponent(entities[i], 
+                    new PhysicsCollider { Value = Unity.Physics.BoxCollider.Create(box) });
+            }
+        }
 
-        entityCommandBufferSystem.AddJobHandleForProducer(jobHandle);
-
-        return jobHandle;
+        entities.Dispose();
+        positions.Dispose();
+        scales.Dispose();
+                
     }
 }
 
-public class RemoveColliderSystem : JobComponentSystem
-{
-    EntityCommandBufferSystem entityCommandBufferSystem;
 
+public class RemoveColliderSystem : ComponentSystem
+{
+    EntityQuery query;
     protected override void OnCreate()
     {
+        var queryDesc = new EntityQueryDesc
+        {
+            All = new ComponentType[]
+            {
+                ComponentType.ReadOnly<VoxelFlag>(),
+                ComponentType.ReadOnly<Translation>(),
+                ComponentType.ReadWrite<PhysicsCollider>()
+            }
+        };
+        query = GetEntityQuery(queryDesc);
         base.OnCreate();
-        entityCommandBufferSystem = World.GetExistingSystem<EndSimulationEntityCommandBufferSystem>();
     }
 
-    protected override JobHandle OnUpdate(JobHandle inputDeps)
+    protected override void OnUpdate()
     {
         float3 userPos = InputManager.userPos;
         float dist = InputManager.colliderDist;
 
-        var entityCommandBuffer = entityCommandBufferSystem.CreateCommandBuffer().AsParallelWriter();
+        NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
+        NativeArray<Translation> positions = query.ToComponentDataArray<Translation>(Allocator.Temp);
 
-        JobHandle jobHandle = Entities
-            .WithAll<VoxelFlag, PhysicsCollider>()
-            .ForEach((Entity entity, int index, in Translation pos) => {
-                if (math.distance(pos.Value, userPos) > dist)
-                {
-                    entityCommandBuffer.RemoveComponent(index, entity, ComponentType.ReadWrite<PhysicsCollider>());
-                }
-            }).Schedule(inputDeps);
+        for (int i = 0; i < entities.Length; i++)
+        {
+            if (math.distance(positions[i].Value, userPos) > dist)
+            {
 
-        entityCommandBufferSystem.AddJobHandleForProducer(jobHandle);
-        return jobHandle;
+                PostUpdateCommands.RemoveComponent<PhysicsCollider>(entities[i]);
+            }
+        }
+
+        entities.Dispose();
+        positions.Dispose();
     }
 }
-*/

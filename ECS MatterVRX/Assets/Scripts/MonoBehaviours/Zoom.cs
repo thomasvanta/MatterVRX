@@ -42,6 +42,7 @@ public class Zoom : MonoBehaviour
 
             InputManager.zoomPivot = userHead.transform.position + zoomCenterOffset * userHead.transform.forward;
             InputManager.zoomFactor = scale;
+            InputManager.colliderDist *= scale;
 
             offset = newOffset;
         }

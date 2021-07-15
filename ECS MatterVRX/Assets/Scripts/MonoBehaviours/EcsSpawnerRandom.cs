@@ -34,7 +34,7 @@ public class EcsSpawnerRandom : MonoBehaviour
             typeof(MainColorComponent),
             typeof(OutlineColorComponent),
             typeof(OutlineComponent)
-            ,typeof(PhysicsCollider)
+            //,typeof(PhysicsCollider)
             );
 
         NativeArray<Entity> entities = new NativeArray<Entity>(size * size * size, Allocator.Temp);
@@ -58,7 +58,7 @@ public class EcsSpawnerRandom : MonoBehaviour
                     entityManager.SetComponentData(entity, new Scale { Value = scale });
 
                     entityManager.SetComponentData(entity, new OutlineComponent { isSelected = false, color = new float4(1, 1, 1, 1) });
-                    
+                    /*
                     BoxGeometry box = new BoxGeometry
                     {
                         Center = float3.zero,
@@ -66,7 +66,7 @@ public class EcsSpawnerRandom : MonoBehaviour
                         Size = new float3(scale,scale,scale)
                     };
                     entityManager.SetComponentData(entity, new PhysicsCollider { Value = Unity.Physics.BoxCollider.Create(box) } );
-                    
+                    */
 
                     entityManager.SetSharedComponentData(entity, new RenderMesh
                     {
