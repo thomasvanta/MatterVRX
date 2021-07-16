@@ -12,6 +12,7 @@ public class Raycast : MonoBehaviour
 {
     [SerializeField] private SteamVR_Behaviour_Pose pose;
     [SerializeField] private SteamVR_Input_Sources handType;
+    [SerializeField] private SteamVR_Action_Boolean click;
     [SerializeField] private GameObject laserPrefab;
     private GameObject laser;
     private Transform laserTransform;
@@ -65,7 +66,10 @@ public class Raycast : MonoBehaviour
 
         if (hit == Entity.Null && lastEntity != Entity.Null)
         {
-            entityManager.SetComponentData(lastEntity, new OutlineComponent { isSelected = false });
+            OutlineComponent outline = entityManager.GetComponentData<OutlineComponent>(lastEntity);
+            outline.isSelected = entityManager.HasComponent<SelectedFlag>(lastEntity);
+            entityManager.SetComponentData(lastEntity, outline);
+
             lastEntity = Entity.Null;
 
             laser.SetActive(false);
@@ -74,9 +78,24 @@ public class Raycast : MonoBehaviour
         {
             if (lastEntity != Entity.Null)
             {
-                entityManager.SetComponentData(lastEntity, new OutlineComponent { isSelected = false });
+                OutlineComponent outline = entityManager.GetComponentData<OutlineComponent>(lastEntity);
+                outline.isSelected = entityManager.HasComponent<SelectedFlag>(lastEntity);
+                entityManager.SetComponentData(lastEntity, outline);
             }
-            entityManager.SetComponentData(hit, new OutlineComponent { isSelected = true, color = new float4(1, 1, 1, 1) });
+
+            bool isHitSelected = entityManager.HasComponent<SelectedFlag>(hit);
+
+            if (GetClick())
+            {
+                if (isHitSelected) entityManager.RemoveComponent<SelectedFlag>(hit);
+                else entityManager.AddComponent<SelectedFlag>(hit);
+
+                isHitSelected = !isHitSelected;
+            }
+
+            float4 color = isHitSelected ? new float4(1, 1, 0, 1) : new float4(1, 1, 1, 1);
+            entityManager.SetComponentData(hit, new OutlineComponent { isSelected = true, color = color });
+
             lastEntity = hit;
 
             ShowLaser(hitPos);
@@ -89,5 +108,15 @@ public class Raycast : MonoBehaviour
         laserTransform.position = Vector3.Lerp(pose.transform.position, hitPos, .5f);
         laserTransform.LookAt(hitPos);
         laserTransform.localScale = new Vector3(laserTransform.localScale.x, laserTransform.localScale.y, math.distance(hitPos, pose.transform.position));
+    }
+
+    private bool GetClick()
+    {
+        return click.GetStateDown(handType);
+    }
+
+    private bool GetHold()
+    {
+        return click.GetState(handType);
     }
 }
