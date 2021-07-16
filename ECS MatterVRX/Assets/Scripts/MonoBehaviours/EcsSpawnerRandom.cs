@@ -28,7 +28,7 @@ public class EcsSpawnerRandom : MonoBehaviour
         EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
         EntityArchetype voxelArchetype = entityManager.CreateArchetype(
-            typeof(VoxelFlag),
+            typeof(VoxelComponent),
             typeof(Translation),
             typeof(Scale),
             typeof(RenderMesh),
@@ -51,13 +51,20 @@ public class EcsSpawnerRandom : MonoBehaviour
                 {
                     Entity entity = entities[x + y * size + z * size2];
                     entityManager.SetComponentData(entity, new Translation { Value = new float3(x, y, z) });
-                    
+
                     Vector4 color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
                     entityManager.SetComponentData(entity, new MainColorComponent { value = color });
                     entityManager.SetComponentData(entity, new OutlineColorComponent { value = color });
 
                     float scale = UnityEngine.Random.Range(minSize, maxSize);
                     entityManager.SetComponentData(entity, new Scale { Value = scale });
+
+                    entityManager.SetComponentData(entity, new VoxelComponent
+                    {
+                        basePosition = new float3(x, y, z),
+                        baseScale = scale,
+                        filtered = false
+                    });
 
                     entityManager.SetComponentData(entity, new OutlineComponent { isSelected = false, color = new float4(1, 1, 1, 1) });
 

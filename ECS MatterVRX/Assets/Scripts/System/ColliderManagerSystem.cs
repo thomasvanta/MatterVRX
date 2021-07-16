@@ -16,7 +16,7 @@ public class AddColliderSystem : ComponentSystem
             None = new ComponentType[] { ComponentType.ReadOnly<PhysicsCollider>() },
             All = new ComponentType[]
             {
-                ComponentType.ReadOnly<VoxelFlag>(),
+                ComponentType.ReadOnly<VoxelComponent>(),
                 ComponentType.ReadOnly<Translation>(),
                 ComponentType.ReadOnly<Scale>()
             }
@@ -67,7 +67,7 @@ public class RemoveColliderSystem : ComponentSystem
         {
             All = new ComponentType[]
             {
-                ComponentType.ReadOnly<VoxelFlag>(),
+                ComponentType.ReadOnly<VoxelComponent>(),
                 ComponentType.ReadOnly<Translation>(),
                 ComponentType.ReadWrite<PhysicsCollider>()
             }
