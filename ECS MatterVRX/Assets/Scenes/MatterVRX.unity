@@ -268,6 +268,7 @@ MonoBehaviour:
   maxSize: 0.5
   mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   material: {fileID: 2100000, guid: 4bee569af90d51645905374b52e4e0e5, type: 2}
+  lineMat: {fileID: 2100002, guid: efe9381559c516743bd05cef82f39ebb, type: 3}
 --- !u!1 &932227596 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 124034, guid: 4d293c8e162f3874b982baadd71153d2, type: 3}

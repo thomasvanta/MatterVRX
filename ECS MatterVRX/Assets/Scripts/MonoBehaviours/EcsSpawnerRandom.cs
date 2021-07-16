@@ -5,6 +5,8 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using Unity.Collections;
 using Unity.Physics;
+using E7.ECS.LineRenderer;
+using System.Collections.Generic;
 
 public class EcsSpawnerRandom : MonoBehaviour
 {
@@ -66,6 +68,24 @@ public class EcsSpawnerRandom : MonoBehaviour
                 }
             }
         }
+
+        Vector3Int v3i;
+        List<Vector3Int> list = DataReader.ReadStreamlineInt(out v3i, "fake-output.txt");
+        float3 v = new float3(v3i.x, v3i.y, v3i.z);
+
+        foreach (Vector3Int dv3i in list)
+        {
+            float3 dv = new float3(dv3i.x, dv3i.y, dv3i.z);
+
+            var e = entityManager.CreateEntity();
+            entityManager.AddComponentData(e, new LineSegment(v, v + dv));
+            entityManager.AddSharedComponentData(e, new LineStyle { material = material });
+
+            v += dv;
+        }
+
+        DataReader.PrintParsed();
+
         entities.Dispose();
     }
 }
