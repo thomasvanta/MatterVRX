@@ -14,7 +14,8 @@ public class EcsSpawnerRandom : MonoBehaviour
     [SerializeField] private float minSize = 0.05f;
     [SerializeField] private float maxSize = 0.5f;
     [SerializeField] private Mesh mesh;
-    [SerializeField] private UnityEngine.Material material;
+    [SerializeField] private UnityEngine.Material voxelMaterial;
+    [SerializeField] private UnityEngine.Material lineMaterial;
 
     // Start is called before the first frame update
     void Start()
@@ -63,7 +64,7 @@ public class EcsSpawnerRandom : MonoBehaviour
                     entityManager.SetSharedComponentData(entity, new RenderMesh
                     {
                         mesh = mesh,
-                        material = material
+                        material = voxelMaterial
                     });
                 }
             }
@@ -79,7 +80,7 @@ public class EcsSpawnerRandom : MonoBehaviour
 
             var e = entityManager.CreateEntity();
             entityManager.AddComponentData(e, new LineSegment(v, v + dv));
-            entityManager.AddSharedComponentData(e, new LineStyle { material = material });
+            entityManager.AddSharedComponentData(e, new LineStyle { material = lineMaterial });
 
             v += dv;
         }
