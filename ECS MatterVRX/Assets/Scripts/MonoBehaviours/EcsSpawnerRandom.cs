@@ -92,7 +92,7 @@ public class EcsSpawnerRandom : MonoBehaviour
             v += dv;
         }
 
-        DataReader.PrintParsed();
+        //DataReader.PrintParsed();
 
         entities.Dispose();
     }
