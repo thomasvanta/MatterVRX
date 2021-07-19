@@ -18,6 +18,9 @@ public class HorizontalMovement : MonoBehaviour // left hand for horizontal move
         InputManager.direction.x = (playerCamera.transform.forward.x * v.y + playerCamera.transform.right.x * v.x) * horizontalSpeed;
         InputManager.direction.z = (playerCamera.transform.forward.z * v.y + playerCamera.transform.right.z * v.x) * horizontalSpeed;
 
+        InputManager.globalPosition.x += InputManager.direction.x;
+        InputManager.globalPosition.z += InputManager.direction.z;
+
         InputManager.camPos = playerCamera.transform.position;
     }
 
