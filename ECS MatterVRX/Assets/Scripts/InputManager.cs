@@ -7,10 +7,12 @@ public static class InputManager
 {
     //Movement
     public static float3 direction = float3.zero;
+    public static float3 globalPosition = float3.zero;
 
     //Zoom
     public static float zoomFactor = 1;
     public static float3 zoomPivot = float3.zero;
+    public static float zoomGlobal = 1;
 
     //user pos
     public static float3 userPos = float3.zero;

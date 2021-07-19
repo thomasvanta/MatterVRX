@@ -16,6 +16,7 @@ public class VerticalMovement : MonoBehaviour // the right hand is used for vert
         Vector2 v = GetDirection();
 
         InputManager.direction.y = v.y * verticalSpeed;
+        InputManager.globalPosition.y += InputManager.direction.y;
     }
 
     public Vector2 GetDirection()
