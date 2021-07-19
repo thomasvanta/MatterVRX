@@ -81,13 +81,21 @@ public class EcsSpawnerRandom : MonoBehaviour
         List<Vector3Int> list = DataReader.ReadStreamlineInt(out v3i, "fake-output.txt");
         float3 v = new float3(v3i.x, v3i.y, v3i.z);
 
-        foreach (Vector3Int dv3i in list)
-        {
-            float3 dv = new float3(dv3i.x, dv3i.y, dv3i.z);
+        EntityArchetype lineArchetype = entityManager.CreateArchetype(
+            typeof(LineComponent),
+            typeof(LineSegment),
+            typeof(LineStyle)
+            );
 
-            var e = entityManager.CreateEntity();
-            entityManager.AddComponentData(e, new LineSegment(v, v + dv));
-            entityManager.AddSharedComponentData(e, new LineStyle { material = lineMaterial });
+        NativeArray<Entity> lines = new NativeArray<Entity>(list.Count, Allocator.Temp);
+        entityManager.CreateEntity(lineArchetype, lines);
+
+        for (int i = 0; i < list.Count; i++)
+        {
+            float3 dv = new float3(list[i].x, list[i].y, list[i].z);
+            entityManager.SetComponentData(lines[i], new LineComponent {baseFrom = v, baseTo = v+dv, filtered = false });
+            entityManager.SetComponentData(lines[i], new LineSegment(v, v + dv));
+            entityManager.SetSharedComponentData(lines[i], new LineStyle { material = lineMaterial });
 
             v += dv;
         }
