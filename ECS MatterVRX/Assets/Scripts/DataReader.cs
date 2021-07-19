@@ -287,4 +287,48 @@ public static class DataReader
             i++;
         }
     }
+
+    // ============================== END OF STREAMLINE PARSING, BEGINNING OF VOXEL PARSING =======================================
+
+    public enum ColorMap { Grey, Hot, Cool }
+
+    // please refer to https://github.com/MRtrix3/mrtrix3/blob/master/src/colourmap.cpp for more color maps
+    // amplitude must be between 0 and 1
+    public static Vector4 ConvertAmplitudeToColor(float amplitude, ColorMap colorMap = ColorMap.Grey)
+    {
+        switch (colorMap)
+        {
+            case ColorMap.Grey:
+                return new Vector4(Mathf.Clamp01(amplitude), Mathf.Clamp01(amplitude), Mathf.Clamp01(amplitude), 1f);
+
+            case ColorMap.Hot:
+                return new Vector4(Mathf.Clamp01(2.7213f * amplitude), Mathf.Clamp01(2.7213f * amplitude - 1), Mathf.Clamp01(3.7727f * amplitude - 2.7727f), 1f);
+
+            case ColorMap.Cool:
+                return new Vector4(Mathf.Clamp01(1.0f - (2.7213f * (1.0f - amplitude))),
+                                   Mathf.Clamp01(1.0f - (2.7213f * (1.0f - amplitude) - 1.0f)),
+                                   Mathf.Clamp01(1.0f - (3.7727f * (1.0f - amplitude) - 2.7727f)), 1f);
+
+            default:
+                return new Vector4(0, 0, 0, 1);
+        }
+    }
+
+    public static Nifti.NET.Nifti<float> ParseNifti(out float maxAmp, string fileName = "T1w_acpc_dc_restore_brain.nii.gz")
+    {
+        string path = "Assets/Resources/" + fileName;
+        var nii = Nifti.NET.NiftiFile.Read(path);
+
+        if (!nii.IsType(typeof(float)))
+        {
+            Debug.Log(".nii is not of type float, stopped parsing");
+            maxAmp = -1;
+            return default;
+        }
+
+        Nifti.NET.Nifti<float> nifti = nii.AsType<float>();
+        maxAmp = Mathf.Max(nifti.Data);
+
+        return nifti;
+    }
 }
