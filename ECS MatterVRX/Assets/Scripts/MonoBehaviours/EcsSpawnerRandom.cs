@@ -42,6 +42,9 @@ public class EcsSpawnerRandom : MonoBehaviour
         NativeArray<Entity> entities = new NativeArray<Entity>(size * size * size, Allocator.Temp);
         entityManager.CreateEntity(voxelArchetype, entities);
 
+        float maxAmp;
+        Nifti.NET.Nifti<float> nifti = DataReader.ParseNifti(out maxAmp);
+
         int size2 = size * size;
         for (int x = 0; x < size; x++)
         {
@@ -52,7 +55,8 @@ public class EcsSpawnerRandom : MonoBehaviour
                     Entity entity = entities[x + y * size + z * size2];
                     entityManager.SetComponentData(entity, new Translation { Value = new float3(x, y, z) });
 
-                    Vector4 color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+                    //Vector4 color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+                    Vector4 color = DataReader.ConvertAmplitudeToColor(nifti[x, z, y] / maxAmp, DataReader.ColorMap.Grey);
                     entityManager.SetComponentData(entity, new MainColorComponent { value = color });
                     entityManager.SetComponentData(entity, new OutlineColorComponent { value = color });
 
