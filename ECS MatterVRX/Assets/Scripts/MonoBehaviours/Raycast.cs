@@ -5,6 +5,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Physics.Systems;
+using Unity.Collections;
 using Unity.Transforms;
 using Valve.VR;
 
@@ -105,9 +106,13 @@ public class Raycast : MonoBehaviour
             if (voxelInfo != null)
             {
                 voxelInfo.gameObject.SetActive(true);
-                voxelInfo.FillInfo(entityManager.GetComponentData<VoxelComponent>(hit).basePosition,
+
+                var voxComp = entityManager.GetComponentData<VoxelComponent>(hit);
+                voxelInfo.FillInfo(voxComp.basePosition,
                                    entityManager.GetComponentData<MainColorComponent>(hit).value,
-                                   0);
+                                   0,
+                                   //voxComp.annotationsIds);
+                                   voxComp.annotationId);
             }
         }
     }

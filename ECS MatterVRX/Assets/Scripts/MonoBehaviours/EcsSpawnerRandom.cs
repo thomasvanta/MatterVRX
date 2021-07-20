@@ -67,7 +67,9 @@ public class EcsSpawnerRandom : MonoBehaviour
                     {
                         basePosition = new float3(x, y, z),
                         baseScale = scale,
-                        filtered = false
+                        filtered = false,
+                        //annotationsIds = new DynamicBuffer<BufferInt>()
+                        annotationId = -1
                     });
 
                     entityManager.SetComponentData(entity, new OutlineComponent { isSelected = false, color = new float4(1, 1, 1, 1) });
