@@ -14,6 +14,7 @@ public class Raycast : MonoBehaviour
     [SerializeField] private SteamVR_Input_Sources handType;
     [SerializeField] private SteamVR_Action_Boolean click;
     [SerializeField] private GameObject laserPrefab;
+    [SerializeField] private VoxelInfo voxelInfo;
     private GameObject laser;
     private Transform laserTransform;
 
@@ -73,6 +74,7 @@ public class Raycast : MonoBehaviour
             lastEntity = Entity.Null;
 
             laser.SetActive(false);
+            if (voxelInfo != null) voxelInfo.gameObject.SetActive(false);
         }
         else if (hit != Entity.Null)
         {
@@ -99,6 +101,14 @@ public class Raycast : MonoBehaviour
             lastEntity = hit;
 
             ShowLaser(hitPos);
+
+            if (voxelInfo != null)
+            {
+                voxelInfo.gameObject.SetActive(true);
+                voxelInfo.FillInfo(entityManager.GetComponentData<VoxelComponent>(hit).basePosition,
+                                   entityManager.GetComponentData<MainColorComponent>(hit).value,
+                                   0);
+            }
         }
     }
 
