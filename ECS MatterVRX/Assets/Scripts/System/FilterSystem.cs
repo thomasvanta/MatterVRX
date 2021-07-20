@@ -7,6 +7,7 @@ public class FilterSystem : JobComponentSystem
 {
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
+        float3 hiddenOffset = new float3(0, 100000, 0) * InputManager.zoomGlobal;
         if (InputManager.doFilter)
         {
             InputManager.doFilter = false;
@@ -22,7 +23,6 @@ public class FilterSystem : JobComponentSystem
                     inputDeps = ResetFilters(inputDeps);
                     jobHandle = Entities.WithNone<SelectedFlag>().ForEach((Entity entity, ref Translation translation, ref VoxelComponent voxel) => {
 
-                        float3 hiddenOffset = new float3(0, 100000, 0);
                         voxel.filtered = true;
                         translation.Value += hiddenOffset;
 
@@ -33,7 +33,6 @@ public class FilterSystem : JobComponentSystem
                     inputDeps = ResetFilters(inputDeps);
                     jobHandle = Entities.ForEach((Entity entity, ref Translation translation, ref VoxelComponent voxel, in SelectedFlag flag) => {
 
-                        float3 hiddenOffset = new float3(0, 100000, 0);
                         voxel.filtered = true;
                         translation.Value += hiddenOffset;
 
@@ -51,9 +50,9 @@ public class FilterSystem : JobComponentSystem
 
     private JobHandle ResetFilters(JobHandle inputDeps)
     {
+        float3 hiddenOffset = new float3(0, 100000, 0) * InputManager.zoomGlobal;
         JobHandle jobHandle = Entities.ForEach((ref Translation translation, ref VoxelComponent voxel) => {
 
-            float3 hiddenOffset = new float3(0, 100000, 0);
             if (voxel.filtered)
             {
                 voxel.filtered = false;

@@ -20,8 +20,6 @@ public class HorizontalMovement : MonoBehaviour // left hand for horizontal move
 
         InputManager.globalPosition.x += InputManager.direction.x;
         InputManager.globalPosition.z += InputManager.direction.z;
-
-        InputManager.camPos = playerCamera.transform.position;
     }
 
     public Vector2 GetDirection()

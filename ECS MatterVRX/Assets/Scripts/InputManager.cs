@@ -18,13 +18,27 @@ public static class InputManager
     public static float3 userPos = float3.zero;
     public static float colliderDist = 50;
 
-    //Camera
-    public static float3 camPos;
-
     //Reset
-    public static bool doReset = false;
+    public static bool doLineReset = false;
+    public static bool doVoxelReset = false;
 
     //Filter
     public static bool doFilter = false;
     public static Filters filterMode = Filters.None;
+
+
+    public static void Reset()
+    {
+        //Movement
+        globalPosition = float3.zero;
+
+        //Zoom
+        zoomFactor = 1;
+        zoomPivot = float3.zero;
+        zoomGlobal = 1;
+
+        //Reset
+        doLineReset = true;
+        doVoxelReset = true;
+}
 }

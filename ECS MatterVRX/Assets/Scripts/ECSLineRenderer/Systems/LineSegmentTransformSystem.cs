@@ -34,7 +34,7 @@ namespace E7.ECS.LineRenderer
         {
             var linePositioningJobHandle = new LinePositioningJob
             {
-                cameraPos = InputManager.camPos,
+                cameraPos = InputManager.userPos,
                 lastSystemVersion = LastSystemVersion,
                 lineSegmentType = GetComponentTypeHandle<LineSegment>(isReadOnly: true),
                 ltwType = GetComponentTypeHandle<LocalToWorld>(isReadOnly: true),

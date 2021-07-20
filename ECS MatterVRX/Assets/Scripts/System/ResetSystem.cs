@@ -8,9 +8,9 @@ public class VoxelResetSystem : JobComponentSystem
 {
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
-        if (InputManager.doReset)
+        if (InputManager.doVoxelReset)
         {
-            InputManager.doReset = false;
+            InputManager.doVoxelReset = false;
             JobHandle jobHandle = Entities.ForEach((ref Translation translation, ref Scale scale, ref VoxelComponent voxel) =>
             {
 
@@ -30,15 +30,16 @@ public class LineResetSystem : JobComponentSystem
 {
     protected override JobHandle OnUpdate(JobHandle inputDeps)
     {
-        if (InputManager.doReset)
+        if (InputManager.doLineReset)
         {
-            InputManager.doReset = false;
+            InputManager.doLineReset = false;
             JobHandle jobHandle = Entities.ForEach((ref LineSegment line, ref LineComponent lineData) =>
             {
 
                 line.from = lineData.baseFrom;
                 line.to = lineData.baseTo;
                 lineData.filtered = false;
+                line.lineWidth = lineData.baseWidth;
 
             }).Schedule(inputDeps);
 

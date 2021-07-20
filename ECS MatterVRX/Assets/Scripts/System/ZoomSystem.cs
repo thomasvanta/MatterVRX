@@ -39,6 +39,8 @@ public class LineZoomSystem : JobComponentSystem
             delta = line.from - pivot;
             line.from = pivot + delta * zoomFactor;
 
+            line.lineWidth *= zoomFactor;
+
         }).Schedule(inputDeps);
 
         return jobHandle;

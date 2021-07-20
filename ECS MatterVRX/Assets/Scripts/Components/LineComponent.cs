@@ -5,5 +5,6 @@ public struct LineComponent : IComponentData
 {
     public float3 baseFrom;
     public float3 baseTo;
+    public float baseWidth;
     public bool filtered;
 }

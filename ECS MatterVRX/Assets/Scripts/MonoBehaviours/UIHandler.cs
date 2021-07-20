@@ -6,7 +6,7 @@ public class UIHandler : MonoBehaviour
 {
     public void PressReset()
     {
-        InputManager.doReset = true;
+        InputManager.Reset();
     }
 
     public void SetFilteringMode(int mode)

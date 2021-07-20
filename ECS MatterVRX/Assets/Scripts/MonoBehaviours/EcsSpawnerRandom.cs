@@ -97,7 +97,8 @@ public class EcsSpawnerRandom : MonoBehaviour
         for (int i = 0; i < list.Count; i++)
         {
             float3 dv = new float3(list[i].x, list[i].y, list[i].z);
-            entityManager.SetComponentData(lines[i], new LineComponent {baseFrom = v, baseTo = v+dv, filtered = false });
+            float lineWidth = 0.1f;
+            entityManager.SetComponentData(lines[i], new LineComponent {baseFrom = v, baseTo = v + dv, filtered = false, baseWidth = lineWidth });
             entityManager.SetComponentData(lines[i], new LineSegment(v, v + dv));
             entityManager.SetSharedComponentData(lines[i], new LineStyle { material = lineMaterial });
 
