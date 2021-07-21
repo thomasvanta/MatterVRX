@@ -25,6 +25,7 @@ public static class InputManager
     //Filter
     public static bool doFilter = false;
     public static Filters filterMode = Filters.None;
+    public static float valueFilter = 0;
 
     //Color map
     public static bool changedColormap = false;

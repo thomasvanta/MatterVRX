@@ -56,7 +56,7 @@ public class EcsSpawnerRandom : MonoBehaviour
                     entityManager.SetComponentData(entity, new Translation { Value = new float3(x, y, z) });
 
                     //Vector4 color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-                    float voxelValue = nifti[x, y, z] / maxAmp;
+                    float voxelValue = nifti[50 + x, 100 + y, 50 + z] / maxAmp;
                     Vector4 color = DataReader.ConvertAmplitudeToColor(voxelValue, DataReader.ColorMap.Grey);
                     entityManager.SetComponentData(entity, new MainColorComponent { value = color });
                     entityManager.SetComponentData(entity, new OutlineColorComponent { value = color });

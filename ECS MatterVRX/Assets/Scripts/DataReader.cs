@@ -290,7 +290,7 @@ public static class DataReader
 
     // ============================== END OF STREAMLINE PARSING, BEGINNING OF VOXEL PARSING =======================================
 
-    public enum ColorMap { Grey, Hot, Cool }
+    public enum ColorMap { Grey, Hot, Cool, Jet }
 
     // please refer to https://github.com/MRtrix3/mrtrix3/blob/master/src/colourmap.cpp for more color maps
     // amplitude must be between 0 and 1
@@ -308,6 +308,11 @@ public static class DataReader
                 return new Vector4(Mathf.Clamp01(1.0f - (2.7213f * (1.0f - amplitude))),
                                    Mathf.Clamp01(1.0f - (2.7213f * (1.0f - amplitude) - 1.0f)),
                                    Mathf.Clamp01(1.0f - (3.7727f * (1.0f - amplitude) - 2.7727f)), 1f);
+
+            case ColorMap.Jet:
+                return new Vector4(Mathf.Clamp01(1.5f - 4.0f * Mathf.Abs(1.0f - amplitude - 0.25f)),
+                                   Mathf.Clamp01(1.5f - 4.0f * Mathf.Abs(1.0f - amplitude - 0.5f)),
+                                   Mathf.Clamp01(1.5f - 4.0f * Mathf.Abs(1.0f - amplitude - 0.75f)), 1f);
 
             default:
                 return new Vector4(0, 0, 0, 1);

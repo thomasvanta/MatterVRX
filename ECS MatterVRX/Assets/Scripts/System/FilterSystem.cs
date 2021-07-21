@@ -21,7 +21,7 @@ public class FilterSystem : JobComponentSystem
 
                 case Filters.Selected:
                     inputDeps = ResetFilters(inputDeps);
-                    jobHandle = Entities.WithNone<SelectedFlag>().ForEach((Entity entity, ref Translation translation, ref VoxelComponent voxel) => {
+                    jobHandle = Entities.WithNone<SelectedFlag>().ForEach((ref Translation translation, ref VoxelComponent voxel) => {
 
                         voxel.filtered = true;
                         translation.Value += hiddenOffset;
@@ -31,10 +31,25 @@ public class FilterSystem : JobComponentSystem
 
                 case Filters.Unselected:
                     inputDeps = ResetFilters(inputDeps);
-                    jobHandle = Entities.ForEach((Entity entity, ref Translation translation, ref VoxelComponent voxel, in SelectedFlag flag) => {
+                    jobHandle = Entities.ForEach((ref Translation translation, ref VoxelComponent voxel, in SelectedFlag flag) => {
 
                         voxel.filtered = true;
                         translation.Value += hiddenOffset;
+
+                    }).Schedule(inputDeps);
+                    break;
+
+                case Filters.OnValue:
+                    inputDeps = ResetFilters(inputDeps);
+
+                    float value = InputManager.valueFilter;
+                    jobHandle = Entities.ForEach((ref Translation translation, ref VoxelComponent voxel) => {
+
+                        if (voxel.value < value)
+                        {
+                            voxel.filtered = true;
+                            translation.Value += hiddenOffset;
+                        }
 
                     }).Schedule(inputDeps);
                     break;
