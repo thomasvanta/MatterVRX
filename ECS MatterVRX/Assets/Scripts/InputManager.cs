@@ -26,6 +26,10 @@ public static class InputManager
     public static bool doFilter = false;
     public static Filters filterMode = Filters.None;
 
+    //Color map
+    public static bool changedColormap = false;
+    public static DataReader.ColorMap colormap = DataReader.ColorMap.Grey;
+
 
     public static void Reset()
     {

@@ -110,7 +110,7 @@ public class Raycast : MonoBehaviour
                 var voxComp = entityManager.GetComponentData<VoxelComponent>(hit);
                 voxelInfo.FillInfo(voxComp.basePosition,
                                    entityManager.GetComponentData<MainColorComponent>(hit).value,
-                                   0,
+                                   voxComp.value,
                                    //voxComp.annotationsIds);
                                    voxComp.annotationId);
             }

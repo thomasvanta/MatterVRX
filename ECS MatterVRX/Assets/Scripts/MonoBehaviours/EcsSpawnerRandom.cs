@@ -56,11 +56,12 @@ public class EcsSpawnerRandom : MonoBehaviour
                     entityManager.SetComponentData(entity, new Translation { Value = new float3(x, y, z) });
 
                     //Vector4 color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-                    Vector4 color = DataReader.ConvertAmplitudeToColor(nifti[x, z, y] / maxAmp, DataReader.ColorMap.Grey);
+                    float voxelValue = nifti[x, y, z] / maxAmp;
+                    Vector4 color = DataReader.ConvertAmplitudeToColor(voxelValue, DataReader.ColorMap.Grey);
                     entityManager.SetComponentData(entity, new MainColorComponent { value = color });
                     entityManager.SetComponentData(entity, new OutlineColorComponent { value = color });
 
-                    float scale = UnityEngine.Random.Range(minSize, maxSize);
+                    float scale = voxelValue <= 0 ? minSize : UnityEngine.Random.Range(minSize, maxSize);
                     entityManager.SetComponentData(entity, new Scale { Value = scale });
 
                     entityManager.SetComponentData(entity, new VoxelComponent
@@ -68,6 +69,7 @@ public class EcsSpawnerRandom : MonoBehaviour
                         basePosition = new float3(x, y, z),
                         baseScale = scale,
                         filtered = false,
+                        value = voxelValue,
                         //annotationsIds = new DynamicBuffer<BufferInt>()
                         annotationId = -1
                     });

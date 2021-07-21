@@ -14,6 +14,12 @@ public class UIHandler : MonoBehaviour
         InputManager.doFilter = true;
         InputManager.filterMode = (Filters)mode;
     }
+
+    public void SetColorMap(int map)
+    {
+        InputManager.changedColormap = true;
+        InputManager.colormap = (DataReader.ColorMap)map;
+    }
 }
 
 public enum Filters

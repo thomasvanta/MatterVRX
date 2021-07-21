@@ -6,6 +6,7 @@ public struct VoxelComponent : IComponentData
 {
     public float3 basePosition;
     public float baseScale;
+    public float value;
     public bool filtered;
     //public DynamicBuffer<BufferInt> annotationsIds;
     public int annotationId;
