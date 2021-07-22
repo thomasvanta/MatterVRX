@@ -13,6 +13,7 @@ public static class InputManager
     public static float zoomFactor = 1;
     public static float3 zoomPivot = float3.zero;
     public static float zoomGlobal = 1;
+    public static float renderDist = 50;
 
     //user pos
     public static float3 userPos = float3.zero;

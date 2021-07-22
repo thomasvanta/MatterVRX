@@ -14,6 +14,7 @@ public class Zoom : MonoBehaviour
     // parameter to export in config file
     [SerializeField] private float zoomFactor = 1.0f;
     [SerializeField] private float zoomCenterOffset = 1.5f;
+    [SerializeField] private float renderDist = 30;
 
     private Vector3 offset;
 
@@ -21,6 +22,7 @@ public class Zoom : MonoBehaviour
     {
         InputManager.zoomPivot = float3.zero;
         InputManager.zoomFactor = 1;
+        InputManager.renderDist = renderDist;
     }
 
     // Update is called once per frame
@@ -44,6 +46,9 @@ public class Zoom : MonoBehaviour
             InputManager.zoomFactor = scale;
             InputManager.zoomGlobal *= scale;
             InputManager.colliderDist *= scale;
+
+            float3 delta = InputManager.globalPosition - InputManager.zoomPivot;
+            InputManager.globalPosition = InputManager.zoomPivot + scale * delta;
 
             offset = newOffset;
         }
