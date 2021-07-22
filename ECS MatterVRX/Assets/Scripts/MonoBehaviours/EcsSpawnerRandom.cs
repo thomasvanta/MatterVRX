@@ -39,8 +39,8 @@ public class EcsSpawnerRandom : MonoBehaviour
             typeof(OutlineComponent)
             );
 
-        NativeArray<Entity> entities = new NativeArray<Entity>(size * size * size, Allocator.Temp);
-        entityManager.CreateEntity(voxelArchetype, entities);
+        //NativeArray<Entity> entities = new NativeArray<Entity>(size * size * size, Allocator.Temp);
+        //entityManager.CreateEntity(voxelArchetype, entities);
 
         float maxAmp;
         Nifti.NET.Nifti<float> nifti = DataReader.ParseNifti(out maxAmp);
@@ -52,11 +52,12 @@ public class EcsSpawnerRandom : MonoBehaviour
             {
                 for (int z = 0; z < size; z++)
                 {
-                    Entity entity = entities[x + y * size + z * size2];
+                    float voxelValue = nifti[x, y, z] / maxAmp;
+                    if (voxelValue <= 0) continue;
+
+                    Entity entity = entityManager.CreateEntity(voxelArchetype); //entities[x + y * size + z * size2];
                     entityManager.SetComponentData(entity, new Translation { Value = new float3(x, y, z) });
 
-                    //Vector4 color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-                    float voxelValue = nifti[50 + x, 100 + y, 50 + z] / maxAmp;
                     Vector4 color = DataReader.ConvertAmplitudeToColor(voxelValue, DataReader.ColorMap.Grey);
                     entityManager.SetComponentData(entity, new MainColorComponent { value = color });
                     entityManager.SetComponentData(entity, new OutlineColorComponent { value = color });
@@ -85,7 +86,7 @@ public class EcsSpawnerRandom : MonoBehaviour
             }
         }
 
-        entities.Dispose();
+        //entities.Dispose();
 
         //GenerateIntLines(ref entityManager);
     }
