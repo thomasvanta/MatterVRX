@@ -23,7 +23,7 @@ public class VoxelInfo : MonoBehaviour
 
     public void FillInfo(Vector3 pos, float4 c, float val, int id) // DynamicBuffer<BufferInt> ids)
     {
-        title.text = "Voxel at " + pos.ToString();
+        title.text = pos.ToString();
         color.text = "Color : " + (255 * c).ToString();
         value.text = "Value : " + val.ToString();
 

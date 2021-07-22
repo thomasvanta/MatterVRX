@@ -44,15 +44,16 @@ public class EcsSpawnerRandom : MonoBehaviour
 
         float maxAmp;
         Nifti.NET.Nifti<float> nifti = DataReader.ParseNifti(out maxAmp);
+        Debug.Log("dimensions : " + nifti.Dimensions[0] + " ; " + nifti.Dimensions[1] + " ; " + nifti.Dimensions[2]);
 
-        int size2 = size * size;
+        //int size2 = size * size;
         for (int x = 0; x < size; x++)
         {
             for (int y = 0; y < size; y++)
             {
                 for (int z = 0; z < size; z++)
                 {
-                    float voxelValue = nifti[x, y, z] / maxAmp;
+                    float voxelValue = nifti[50 + x, 50 + y, 50 + z] / maxAmp;
                     if (voxelValue <= 0) continue;
 
                     Entity entity = entityManager.CreateEntity(voxelArchetype); //entities[x + y * size + z * size2];
