@@ -39,8 +39,8 @@ public class EcsSpawnerRandom : MonoBehaviour
             typeof(OutlineComponent)
             );
 
-        NativeArray<Entity> entities = new NativeArray<Entity>(size * size * size, Allocator.Temp);
-        entityManager.CreateEntity(voxelArchetype, entities);
+        //NativeArray<Entity> entities = new NativeArray<Entity>(size * size * size, Allocator.Temp);
+        //entityManager.CreateEntity(voxelArchetype, entities);
 
         float maxAmp;
         Nifti.NET.Nifti<float> nifti = DataReader.ParseNifti(out maxAmp);
@@ -52,11 +52,12 @@ public class EcsSpawnerRandom : MonoBehaviour
             {
                 for (int z = 0; z < size; z++)
                 {
-                    Entity entity = entities[x + y * size + z * size2];
+                    float voxelValue = nifti[x, y, z] / maxAmp;
+                    if (voxelValue <= 0) continue;
+
+                    Entity entity = entityManager.CreateEntity(voxelArchetype); //entities[x + y * size + z * size2];
                     entityManager.SetComponentData(entity, new Translation { Value = new float3(x, y, z) });
 
-                    //Vector4 color = UnityEngine.Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-                    float voxelValue = nifti[50 + x, 100 + y, 50 + z] / maxAmp;
                     Vector4 color = DataReader.ConvertAmplitudeToColor(voxelValue, DataReader.ColorMap.Grey);
                     entityManager.SetComponentData(entity, new MainColorComponent { value = color });
                     entityManager.SetComponentData(entity, new OutlineColorComponent { value = color });
@@ -85,32 +86,46 @@ public class EcsSpawnerRandom : MonoBehaviour
             }
         }
 
-        Vector3Int v3i;
-        List<Vector3Int> list = DataReader.ReadStreamlineInt(out v3i, "fake-output.txt");
-        float3 v = new float3(v3i.x, v3i.y, v3i.z);
+        //entities.Dispose();
 
+        //GenerateIntLines(ref entityManager);
+    }
+
+    private void GenerateIntLines(ref EntityManager entityManager)
+    {
         EntityArchetype lineArchetype = entityManager.CreateArchetype(
             typeof(LineComponent),
             typeof(LineSegment),
-            typeof(LineStyle)
+            typeof(LineStyle),
+            typeof(MainColorComponent),
+            typeof(OutlineColorComponent)
             );
 
-        NativeArray<Entity> lines = new NativeArray<Entity>(list.Count, Allocator.Temp);
-        entityManager.CreateEntity(lineArchetype, lines);
+        List<DataReader.IntStreamline> streamlines = DataReader.ReadIntLines();
 
-        for (int i = 0; i < list.Count; i++)
+        foreach (DataReader.IntStreamline line in streamlines)
         {
-            float3 dv = new float3(list[i].x, list[i].y, list[i].z);
-            float lineWidth = 0.1f;
-            entityManager.SetComponentData(lines[i], new LineComponent {baseFrom = v, baseTo = v + dv, filtered = false, baseWidth = lineWidth });
-            entityManager.SetComponentData(lines[i], new LineSegment(v, v + dv));
-            entityManager.SetSharedComponentData(lines[i], new LineStyle { material = lineMaterial });
+            if (line.strength <= 0 || line.line.Count <= 0) continue;
 
-            v += dv;
+            int n = line.line.Count;
+            NativeArray<Entity> lines = entityManager.CreateEntity(lineArchetype, n, Allocator.Temp);
+
+            float3 v = new float3(line.start.x, line.start.y, line.start.z);
+            for (int i = 0; i < n; i++)
+            {
+                float3 dv = new float3(line.line[i].x, line.line[i].y, line.line[i].z);
+
+                float lineWidth = 0.1f * line.strength;
+                entityManager.SetComponentData(lines[i], new LineComponent { baseFrom = v, baseTo = v + dv, filtered = false, baseWidth = lineWidth });
+                entityManager.SetComponentData(lines[i], new LineSegment(v, v + dv));
+                entityManager.SetSharedComponentData(lines[i], new LineStyle { material = lineMaterial });
+                entityManager.SetComponentData(lines[i], new MainColorComponent { value = new float4(line.mixedColor.r / 255f, line.mixedColor.g / 255f, line.mixedColor.b / 255f, 1) });
+                entityManager.SetComponentData(lines[i], new OutlineColorComponent { value = new float4(0, 0, 0, 0) });
+
+                v += dv;
+            }
+
+            lines.Dispose();
         }
-
-        //DataReader.PrintParsed();
-
-        entities.Dispose();
     }
 }

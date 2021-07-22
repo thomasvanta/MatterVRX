@@ -202,9 +202,9 @@ public static class DataReader
         int i = 0;
         int j = 0;
         string fillerZeros = new String('0', digitsNumber - 1);
-        string linePath = "Assets/Resources/" + streamlineFileNameTemplate + fillerZeros + i.ToString() + ".txt";
+        string linePath = streamlineFileNameTemplate + fillerZeros + i.ToString() + ".txt";
 
-        while (File.Exists(linePath))
+        while (File.Exists("Assets/Resources/" + linePath))
         {
             Tuple<int, int> lineEnd = lineEnds[i];
             IntStreamline line = new IntStreamline();
@@ -223,7 +223,7 @@ public static class DataReader
                 j++;
                 fillerZeros = new String('0', digitsNumber - j - 1);
             }
-            linePath = "Assets/Resources/" + streamlineFileNameTemplate + fillerZeros + i.ToString() + ".txt";
+            linePath = streamlineFileNameTemplate + fillerZeros + i.ToString() + ".txt";
         }
 
         return lines;
