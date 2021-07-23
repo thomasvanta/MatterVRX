@@ -21,7 +21,7 @@ public class FilterSystem : JobComponentSystem
 
                 case Filters.Selected:
                     inputDeps = ResetFilters(inputDeps);
-                    jobHandle = Entities.WithNone<SelectedFlag>().ForEach((ref Translation translation, ref VoxelComponent voxel) => {
+                    jobHandle = Entities.WithEntityQueryOptions(EntityQueryOptions.IncludeDisabled).WithNone<SelectedFlag>().ForEach((ref Translation translation, ref VoxelComponent voxel) => {
 
                         voxel.filtered = true;
                         translation.Value += hiddenOffset;
@@ -31,7 +31,7 @@ public class FilterSystem : JobComponentSystem
 
                 case Filters.Unselected:
                     inputDeps = ResetFilters(inputDeps);
-                    jobHandle = Entities.ForEach((ref Translation translation, ref VoxelComponent voxel, in SelectedFlag flag) => {
+                    jobHandle = Entities.WithEntityQueryOptions(EntityQueryOptions.IncludeDisabled).ForEach((ref Translation translation, ref VoxelComponent voxel, in SelectedFlag flag) => {
 
                         voxel.filtered = true;
                         translation.Value += hiddenOffset;
@@ -43,7 +43,7 @@ public class FilterSystem : JobComponentSystem
                     inputDeps = ResetFilters(inputDeps);
 
                     float value = InputManager.valueFilter;
-                    jobHandle = Entities.ForEach((ref Translation translation, ref VoxelComponent voxel) => {
+                    jobHandle = Entities.WithEntityQueryOptions(EntityQueryOptions.IncludeDisabled).ForEach((ref Translation translation, ref VoxelComponent voxel) => {
 
                         if (voxel.value < value)
                         {
@@ -66,7 +66,7 @@ public class FilterSystem : JobComponentSystem
     private JobHandle ResetFilters(JobHandle inputDeps)
     {
         float3 hiddenOffset = new float3(0, 100000, 0) * InputManager.zoomGlobal;
-        JobHandle jobHandle = Entities.ForEach((ref Translation translation, ref VoxelComponent voxel) => {
+        JobHandle jobHandle = Entities.WithEntityQueryOptions(EntityQueryOptions.IncludeDisabled).ForEach((ref Translation translation, ref VoxelComponent voxel) => {
 
             if (voxel.filtered)
             {

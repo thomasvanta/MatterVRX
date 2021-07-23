@@ -39,7 +39,7 @@ public class VoxelEnabler : ComponentSystem
         for (int i = 0; i < entities.Length; i++)
         {
             float3 newPos = globalPos + globalScale * voxels[i].basePosition;
-            if (math.distancesq(newPos, float3.zero) < distsq)
+            if (math.distancesq(newPos, float3.zero) < distsq && !voxels[i].filtered)
             {
                 PostUpdateCommands.RemoveComponent<Disabled>(entities[i]);
                 PostUpdateCommands.SetComponent(entities[i], 

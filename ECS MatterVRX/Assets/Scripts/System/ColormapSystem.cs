@@ -10,7 +10,7 @@ public class ColormapSystem : JobComponentSystem
         InputManager.changedColormap = false;
 
         DataReader.ColorMap map = InputManager.colormap;
-        JobHandle jobHandle = Entities.ForEach((ref MainColorComponent mainColor, in VoxelComponent voxel) => {
+        JobHandle jobHandle = Entities.WithEntityQueryOptions(EntityQueryOptions.IncludeDisabled).ForEach((ref MainColorComponent mainColor, in VoxelComponent voxel) => {
 
             mainColor.value = DataReader.ConvertAmplitudeToColor(voxel.value, map);
 
