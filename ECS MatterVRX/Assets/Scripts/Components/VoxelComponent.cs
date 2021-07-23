@@ -8,13 +8,6 @@ public struct VoxelComponent : IComponentData
     public float baseScale;
     public float value;
     public bool filtered;
-    //public DynamicBuffer<BufferInt> annotationsIds;
-    public int annotationId;
+    public int4 annotationsIds;
 }
-
-//[InternalBufferCapacity(3)]
-//public struct BufferInt : IBufferElementData
-//{
-//    public int value;
-//}
  

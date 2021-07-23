@@ -73,7 +73,7 @@ public class EcsSpawnerRandom : MonoBehaviour
                         filtered = false,
                         value = voxelValue,
                         //annotationsIds = new DynamicBuffer<BufferInt>()
-                        annotationId = -1
+                        annotationsIds = new int4(-1, -1, -1, -1)
                     });
 
                     entityManager.SetComponentData(entity, new OutlineComponent { isSelected = false, color = new float4(1, 1, 1, 1) });

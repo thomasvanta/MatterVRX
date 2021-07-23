@@ -8,11 +8,23 @@ public class DictationSystem : JobComponentSystem
     {
         if (!DictationEngine.recording) return default;
 
-        int i = DictationEngine.currentIndex;
-        JobHandle jobHandle = Entities.ForEach((ref VoxelComponent voxel, in SelectedFlag flag) => {
+        int dictIndex = DictationEngine.currentIndex;
+        JobHandle jobHandle = Entities.WithEntityQueryOptions(EntityQueryOptions.IncludeDisabled).ForEach((ref VoxelComponent voxel, in SelectedFlag flag) => { // .WithEntityQueryOptions(EntityQueryOptions.IncludeDisabled) if we want to annotate disabled but selected voxels
 
-            //voxel.annotationsIds.Add(new BufferInt { value = i });
-            voxel.annotationId = i;
+            for (int i = 0; i < 4; i++)
+            {
+                if (voxel.annotationsIds[i] == dictIndex) return;
+            }
+            
+            for (int i = 0; i < 4; i++)
+            {
+                if (voxel.annotationsIds[i] < 0)
+                {
+                    voxel.annotationsIds[i] = dictIndex;
+                    voxel.annotationsIds[(i + 1) % 4] = -1; // cyclical overridance of annotations
+                    return;
+                }
+            }
 
         }).Schedule(inputDeps);
 

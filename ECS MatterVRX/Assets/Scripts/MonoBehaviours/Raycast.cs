@@ -112,7 +112,7 @@ public class Raycast : MonoBehaviour
                                    entityManager.GetComponentData<MainColorComponent>(hit).value,
                                    voxComp.value,
                                    //voxComp.annotationsIds);
-                                   voxComp.annotationId);
+                                   voxComp.annotationsIds);
             }
         }
     }
