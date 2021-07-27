@@ -12,7 +12,7 @@
 /*/[Mm]emoryCaptures/
 /*/Assets/SteamVR/
 /*/Assets/SteamVR_Input/
-/*/Assets/SteamVR_Resources/
+/*/Assets/SteamVR_Resources/ 
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/[Aa]ssets/**/*.meta
