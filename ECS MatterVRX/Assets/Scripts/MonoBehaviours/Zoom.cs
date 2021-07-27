@@ -11,19 +11,7 @@ public class Zoom : MonoBehaviour
     [SerializeField] private SteamVR_Input_Sources rightHandType;
     [SerializeField] private SteamVR_Action_Single squeeze;
 
-    // parameter to export in config file
-    [SerializeField] private float zoomFactor = 1.0f;
-    [SerializeField] private float zoomCenterOffset = 1.5f;
-    [SerializeField] private float renderDist = 30;
-
     private Vector3 offset;
-
-    private void Start()
-    {
-        InputManager.zoomPivot = float3.zero;
-        InputManager.zoomFactor = 1;
-        InputManager.renderDist = renderDist;
-    }
 
     // Update is called once per frame
     void Update()
@@ -40,9 +28,9 @@ public class Zoom : MonoBehaviour
 
             if (offset.sqrMagnitude == 0) return;
 
-            float scale = ((newOffset.sqrMagnitude / offset.sqrMagnitude) - 1) * zoomFactor + 1;
+            float scale = ((newOffset.sqrMagnitude / offset.sqrMagnitude) - 1) * InputManager.zoomSpeed + 1;
 
-            InputManager.zoomPivot = userHead.transform.position + zoomCenterOffset * userHead.transform.forward;
+            InputManager.zoomPivot = userHead.transform.position + InputManager.zoomCenterOffset * userHead.transform.forward;
             InputManager.zoomFactor = scale;
             InputManager.zoomGlobal *= scale;
             InputManager.colliderDist *= scale;

@@ -6,18 +6,31 @@ using Unity.Transforms;
 public static class InputManager
 {
     //Movement
+    //parameters
+    public static float verticalSpeed = 1;
+    public static float horizontalSpeed = 1;
+    //updates
     public static float3 direction = float3.zero;
     public static float3 globalPosition = float3.zero;
 
+
     //Zoom
+    //parameters
+    public static float zoomSpeed = 1;
+    public static float zoomCenterOffset = 1.5f;
+    public static float renderDist = 50;
+    //update
     public static float zoomFactor = 1;
     public static float3 zoomPivot = float3.zero;
     public static float zoomGlobal = 1;
-    public static float renderDist = 50;
+
 
     //user pos
-    public static float3 userPos = float3.zero;
+    //parameters
     public static float colliderDist = 50;
+    //update
+    public static float3 userPos = float3.zero;
+
 
     //Reset
     public static bool doLineReset = false;

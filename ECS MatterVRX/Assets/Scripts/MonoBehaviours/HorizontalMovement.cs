@@ -7,16 +7,13 @@ public class HorizontalMovement : MonoBehaviour // left hand for horizontal move
     [SerializeField] private SteamVR_Action_Vector2 trackPad;
     [SerializeField] private Camera playerCamera;
 
-    // parameter to export in config file
-    [SerializeField] private float horizontalSpeed = 1;
-
 
     void Update()
     {
         Vector2 v = GetDirection();
 
-        InputManager.direction.x = (playerCamera.transform.forward.x * v.y + playerCamera.transform.right.x * v.x) * horizontalSpeed;
-        InputManager.direction.z = (playerCamera.transform.forward.z * v.y + playerCamera.transform.right.z * v.x) * horizontalSpeed;
+        InputManager.direction.x = (playerCamera.transform.forward.x * v.y + playerCamera.transform.right.x * v.x) * InputManager.horizontalSpeed;
+        InputManager.direction.z = (playerCamera.transform.forward.z * v.y + playerCamera.transform.right.z * v.x) * InputManager.horizontalSpeed;
 
         InputManager.globalPosition.x += InputManager.direction.x * Time.deltaTime;
         InputManager.globalPosition.z += InputManager.direction.z * Time.deltaTime;

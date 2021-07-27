@@ -29,6 +29,7 @@ public class VoxelEnabler : ComponentSystem
     {
         float dist = InputManager.renderDist * InputManager.zoomGlobal;
         float distsq = dist * dist;
+        float3 center = InputManager.zoomPivot;
         float3 globalPos = InputManager.globalPosition;
         float globalScale = InputManager.zoomGlobal;
 
@@ -39,7 +40,7 @@ public class VoxelEnabler : ComponentSystem
         for (int i = 0; i < entities.Length; i++)
         {
             float3 newPos = globalPos + globalScale * voxels[i].basePosition;
-            if (math.distancesq(newPos, float3.zero) < distsq && !voxels[i].filtered)
+            if (math.distancesq(newPos, center) < distsq && !voxels[i].filtered)
             {
                 PostUpdateCommands.RemoveComponent<Disabled>(entities[i]);
                 PostUpdateCommands.SetComponent(entities[i], 
@@ -74,12 +75,13 @@ public class EntityDisabler : ComponentSystem
     {
         float dist = InputManager.renderDist * InputManager.zoomGlobal;
         float distsq = dist * dist;
+        float3 center = InputManager.zoomPivot;
         NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
         NativeArray<Translation> positions = query.ToComponentDataArray<Translation>(Allocator.Temp);
 
         for (int i = 0; i < entities.Length; i++)
         {
-            if (math.distancesq(positions[i].Value, float3.zero) > distsq)
+            if (math.distancesq(positions[i].Value, center) > distsq)
             {
                 PostUpdateCommands.AddComponent<Disabled>(entities[i]);
             }
