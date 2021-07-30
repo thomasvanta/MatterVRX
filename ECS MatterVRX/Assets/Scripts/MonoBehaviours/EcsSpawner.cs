@@ -8,8 +8,9 @@ using Unity.Physics;
 using E7.ECS.LineRenderer;
 using System.Collections.Generic;
 
-public class EcsSpawnerRandom : MonoBehaviour
+public class EcsSpawner : MonoBehaviour
 {
+    [SerializeField] private bool wholeFile = false;
     [SerializeField] private int size = 10;
     [SerializeField] private float minSize = 0.05f;
     [SerializeField] private float maxSize = 0.5f;
@@ -20,10 +21,11 @@ public class EcsSpawnerRandom : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        randomGen();
+        if (wholeFile) fullLoad();
+        else LimitedLoad();
     }
 
-    void randomGen()
+    void LimitedLoad()
     {
         EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
@@ -90,6 +92,69 @@ public class EcsSpawnerRandom : MonoBehaviour
         //entities.Dispose();
 
         //GenerateIntLines(ref entityManager);
+    }
+
+    private void fullLoad()
+    {
+        EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+
+        EntityArchetype voxelArchetype = entityManager.CreateArchetype(
+            typeof(VoxelComponent),
+            typeof(Translation),
+            typeof(Scale),
+            typeof(RenderMesh),
+            typeof(LocalToWorld),
+            typeof(RenderBounds),
+            typeof(MainColorComponent),
+            typeof(OutlineColorComponent),
+            typeof(OutlineComponent)
+            );
+
+
+        float maxAmp;
+        Nifti.NET.Nifti<float> nifti = DataReader.ParseNifti(out maxAmp);
+        Debug.Log("dimensions : " + nifti.Dimensions[0] + " ; " + nifti.Dimensions[1] + " ; " + nifti.Dimensions[2]);
+
+
+        for (int x = 0; x < nifti.Dimensions[0]; x++)
+        {
+            for (int y = 0; y < nifti.Dimensions[1]; y++)
+            {
+                for (int z = 0; z < nifti.Dimensions[2]; z++)
+                {
+                    float voxelValue = nifti[x, y, z] / maxAmp;
+                    if (voxelValue <= 0) continue;
+
+                    Entity entity = entityManager.CreateEntity(voxelArchetype);
+                    entityManager.SetComponentData(entity, new Translation { Value = new float3(x, y, z) });
+
+                    Vector4 color = DataReader.ConvertAmplitudeToColor(voxelValue, DataReader.ColorMap.Grey);
+                    entityManager.SetComponentData(entity, new MainColorComponent { value = color });
+                    entityManager.SetComponentData(entity, new OutlineColorComponent { value = color });
+
+                    float scale = voxelValue <= 0 ? minSize : UnityEngine.Random.Range(minSize, maxSize);
+                    entityManager.SetComponentData(entity, new Scale { Value = scale });
+
+                    entityManager.SetComponentData(entity, new VoxelComponent
+                    {
+                        basePosition = new float3(x, y, z),
+                        baseScale = scale,
+                        filtered = false,
+                        value = voxelValue,
+                        //annotationsIds = new DynamicBuffer<BufferInt>()
+                        annotationsIds = new int4(-1, -1, -1, -1)
+                    });
+
+                    entityManager.SetComponentData(entity, new OutlineComponent { isSelected = false, color = new float4(1, 1, 1, 1) });
+
+                    entityManager.SetSharedComponentData(entity, new RenderMesh
+                    {
+                        mesh = mesh,
+                        material = voxelMaterial
+                    });
+                }
+            }
+        }
     }
 
     private void GenerateIntLines(ref EntityManager entityManager)
