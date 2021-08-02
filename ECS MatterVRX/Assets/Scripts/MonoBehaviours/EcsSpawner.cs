@@ -45,7 +45,7 @@ public class EcsSpawner : MonoBehaviour
         //entityManager.CreateEntity(voxelArchetype, entities);
 
         float maxAmp;
-        Nifti.NET.Nifti<float> nifti = DataReader.ParseNifti(out maxAmp);
+        Nifti.NET.Nifti<float> nifti = DataReader.ParseNifti(out maxAmp, fileName: "5tt.nii");
         Debug.Log("dimensions : " + nifti.Dimensions[0] + " ; " + nifti.Dimensions[1] + " ; " + nifti.Dimensions[2]);
 
         //int size2 = size * size;
