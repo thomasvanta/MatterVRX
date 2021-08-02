@@ -1,15 +1,25 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System;
+using Unity.Entities;
+using Unity.Mathematics;
 
 public class StylesheetLoader : MonoBehaviour
 {
+    public static StyleClass[] styleClasses;
+
+    private static Dictionary<string, ComponentType> cssCorrespondance;
+
     public class StyleClass
     {
         public string Name;
         public SortedList<string, string> Attributes;
         public SortedList<string, string> Conditions;
+
+        public EntityQueryDesc QueryDesc;
+
+        private static char[] HexVals = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
         public static List<StyleClass> FillClasses(string fileName = "stylesheet.css")
         {
@@ -55,6 +65,7 @@ public class StylesheetLoader : MonoBehaviour
                 sclass.Attributes.Add(split[0], split[1]);
             }
 
+            sclass.BuildQueryDesc();
             return sclass;
         }
 
@@ -74,13 +85,44 @@ public class StylesheetLoader : MonoBehaviour
 
             return txt;
         }
+
+        public void BuildQueryDesc()
+        {
+            List<ComponentType> all = new List<ComponentType>
+            {
+                ComponentType.ReadOnly<VoxelComponent>(),
+                ComponentType.ReadWrite<MainColorComponent>(),
+                ComponentType.ReadWrite<OutlineColorComponent>()
+            };
+
+            foreach (var k in cssCorrespondance)
+            {
+                if (Name.Contains(k.Key)) all.Add(k.Value);
+            }
+
+            QueryDesc = new EntityQueryDesc
+            {
+                Options = EntityQueryOptions.IncludeDisabled,
+                All = all.ToArray()
+            };
+        }
+
+        public static float4 ParseHexColor(string colorString)
+        {
+            string s = colorString.Trim('#').Trim();
+            float r = 16 * Array.IndexOf(HexVals, s[0]) + Array.IndexOf(HexVals, s[1]) / 255f;
+            float g = 16 * Array.IndexOf(HexVals, s[2]) + Array.IndexOf(HexVals, s[3]) / 255f;
+            float b = 16 * Array.IndexOf(HexVals, s[4]) + Array.IndexOf(HexVals, s[5]) / 255f;
+            return new float4(r, g, b, 1f);
+        }
     }
 
     void Start()
     {
-        foreach (StyleClass s in StyleClass.FillClasses())
+        cssCorrespondance = new Dictionary<string, ComponentType>
         {
-            Debug.Log(s.ToString());
-        }
+            { "selected", typeof(SelectedFlag) },
+        };
+        styleClasses = StyleClass.FillClasses().ToArray();
     }
 }
