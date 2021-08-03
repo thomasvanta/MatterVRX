@@ -292,6 +292,8 @@ public static class DataReader
 
     public enum ColorMap { Grey, Hot, Cool, Jet }
 
+    public static string parsedNiftiName = "";
+
     // please refer to https://github.com/MRtrix3/mrtrix3/blob/master/src/colourmap.cpp for more color maps
     // amplitude must be between 0 and 1
     public static Vector4 ConvertAmplitudeToColor(float amplitude, ColorMap colorMap = ColorMap.Grey)
@@ -321,6 +323,7 @@ public static class DataReader
 
     public static Nifti.NET.Nifti<float> ParseNifti(out float maxAmp, string fileName = "T1w_acpc_dc_restore_brain.nii.gz")
     {
+        parsedNiftiName = fileName.Split('.')[0];
         string path = "Assets/Resources/" + fileName;
         var nii = Nifti.NET.NiftiFile.Read(path);
 
