@@ -4,89 +4,30 @@ using System.IO;
 using System;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Collections;
 
 public class StylesheetLoader : MonoBehaviour
 {
-    public static StyleClass[] styleClasses;
+    private static StyleClass[] styleClasses;
 
     private static Dictionary<string, ComponentType> cssCorrespondance;
+    private static char[] HexVals = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
-    public class StyleClass
+    [ReadOnly] public static List<string> AllStyleNames = new List<string>();
+    [ReadOnly] public static List<string> AllAttributeNames = new List<string>();
+    [ReadOnly] public static List<string> AllAttributesValues = new List<string>();
+    [ReadOnly] public static List<string> AllConditionNames = new List<string>();
+    [ReadOnly] public static List<string> AllConditionValues = new List<string>();
+
+    public struct StyleClass
     {
-        public string Name;
-        public SortedList<string, string> Attributes;
-        public SortedList<string, string> Conditions;
+        public int Name;
+        public int4 AttributeNames;
+        public int4 AttributeValues;
+        public int4 ConditionNames;
+        public int4 ConditionValues;
 
-        public EntityQueryDesc QueryDesc;
-
-        private static char[] HexVals = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
-
-        public static List<StyleClass> FillClasses(string fileName = "stylesheet.css")
-        {
-            string full = File.ReadAllText(Path.Combine(Application.dataPath, "Configuration/" + fileName));
-            var formattedClasses = full.Split('}');
-            List<StyleClass> classes = new List<StyleClass>();
-
-            for (int i = 0; i < formattedClasses.Length; i++)
-            {
-                var c = FillClass(formattedClasses[i]);
-                if (c != null) classes.Add(c);
-            }
-
-            return classes;
-        }
-
-        public static StyleClass FillClass(string formattedString)
-        {
-            var halfSplit = formattedString.Split('{');
-            if (halfSplit.Length <= 1) return null;
-
-            StyleClass sclass = new StyleClass();
-            sclass.Name = halfSplit[0].Trim();
-            sclass.Attributes = new SortedList<string, string>();
-            sclass.Conditions = new SortedList<string, string>();
-
-            var names = sclass.Name.Split(' ');
-            for (int i = 0; i < names.Length; i++)
-            {
-                var cond = names[i].Split(':');
-                if (cond.Length > 1)
-                {
-                    sclass.Conditions.Add(cond[0], cond[1]);
-                }
-            }
-
-            var attr = halfSplit[1].Trim().Split('\n');
-            for (int i = 0; i < attr.Length; i++)
-            {
-                var split = attr[i].Trim(';').Trim().Split(':');
-                if (split.Length <= 1) continue;
-                split[1].Trim();
-                sclass.Attributes.Add(split[0], split[1]);
-            }
-
-            sclass.BuildQueryDesc();
-            return sclass;
-        }
-
-        public override string ToString()
-        {
-            string txt = Name + " class :\n";
-            
-            foreach (var c in Conditions)
-            {
-                txt += "if " + c.Key + " " + c.Value + "\n";
-            }
-
-            foreach (var c in Attributes)
-            {
-                txt += c.Key + ": " + c.Value + "\n";
-            }
-
-            return txt;
-        }
-
-        public void BuildQueryDesc()
+        public EntityQueryDesc BuildQueryDesc()
         {
             List<ComponentType> all = new List<ComponentType>
             {
@@ -97,23 +38,14 @@ public class StylesheetLoader : MonoBehaviour
 
             foreach (var k in cssCorrespondance)
             {
-                if (Name.Contains(k.Key)) all.Add(k.Value);
+                if (AllStyleNames[Name].Contains(k.Key)) all.Add(k.Value);
             }
 
-            QueryDesc = new EntityQueryDesc
+            return new EntityQueryDesc
             {
                 Options = EntityQueryOptions.IncludeDisabled,
                 All = all.ToArray()
             };
-        }
-
-        public static float4 ParseHexColor(string colorString)
-        {
-            string s = colorString.Trim().Trim('#');
-            float r = (16f * Array.IndexOf(HexVals, s[0]) + Array.IndexOf(HexVals, s[1])) / 255f;
-            float g = (16f * Array.IndexOf(HexVals, s[2]) + Array.IndexOf(HexVals, s[3])) / 255f;
-            float b = (16f * Array.IndexOf(HexVals, s[4]) + Array.IndexOf(HexVals, s[5])) / 255f;
-            return new float4(r, g, b, 1f);
         }
     }
 
@@ -123,6 +55,99 @@ public class StylesheetLoader : MonoBehaviour
         {
             { "selected", typeof(SelectedFlag) },
         };
-        styleClasses = StyleClass.FillClasses().ToArray();
+        styleClasses = FillClasses().ToArray();
+    }
+
+    public static NativeArray<StyleClass> GetStyleArray()
+    {
+        NativeArray<StyleClass> res = new NativeArray<StyleClass>(styleClasses, Allocator.TempJob);
+        return res;
+    }
+
+    private List<StyleClass> FillClasses(string fileName = "stylesheet.css")
+    {
+        string full = File.ReadAllText(Path.Combine(Application.dataPath, "Configuration/" + fileName));
+        var formattedClasses = full.Split('}');
+        List<StyleClass> classes = new List<StyleClass>();
+
+        for (int i = 0; i < formattedClasses.Length; i++)
+        {
+            var c = FillClass(formattedClasses[i]);
+            if (c.Name >= 0) classes.Add(c);
+        }
+
+        return classes;
+    }
+
+    private StyleClass FillClass(string formattedString)
+    {
+        var halfSplit = formattedString.Split('{');
+        if (halfSplit.Length <= 1) return new StyleClass { Name = -1 };
+
+        StyleClass sclass = new StyleClass();
+        sclass.Name = AllStyleNames.Count;
+        AllStyleNames.Add(halfSplit[0].Trim());
+
+        sclass.AttributeNames = new int4(-1, -1, -1, -1);
+        sclass.AttributeValues = new int4(-1, -1, -1, -1);
+        sclass.ConditionNames = new int4(-1, -1, -1, -1);
+        sclass.ConditionValues = new int4(-1, -1, -1, -1);
+
+        var names = AllStyleNames[sclass.Name].Split(' ');
+        for (int i = 0; i < names.Length && i < 4; i++)
+        {
+            var cond = names[i].Split(':');
+            if (cond.Length > 1)
+            {
+                int acn = AllConditionNames.IndexOf(cond[0]);
+                int acv = AllConditionValues.IndexOf(cond[1]);
+                if (acn < 0)
+                {
+                    acn = AllConditionNames.Count;
+                    AllConditionNames.Add(cond[0]);
+                }
+                if (acv < 0)
+                {
+                    acv = AllConditionValues.Count;
+                    AllConditionValues.Add(cond[1]);
+                }
+                sclass.ConditionNames[i] = acn;
+                sclass.ConditionValues[i] = acv;
+            }
+        }
+
+        var attr = halfSplit[1].Trim().Split('\n');
+        for (int i = 0; i < attr.Length; i++)
+        {
+            var split = attr[i].Trim(';').Trim().Split(':');
+            if (split.Length <= 1) continue;
+
+            int aan = AllAttributeNames.IndexOf(split[0]);
+            int aav = AllAttributesValues.IndexOf(split[1]);
+            if (aan < 0)
+            {
+                aan = AllAttributeNames.Count;
+                AllAttributeNames.Add(split[0]);
+            }
+            if (aav < 0)
+            {
+                aav = AllAttributesValues.Count;
+                AllAttributesValues.Add(split[1]);
+            }
+            sclass.AttributeNames[i] = aan;
+            sclass.AttributeValues[i] = aav;
+        }
+
+        sclass.BuildQueryDesc();
+        return sclass;
+    }
+
+    public static float4 ParseHexColor(string colorString)
+    {
+        string s = colorString.Trim().Trim('#');
+        float r = (16f * Array.IndexOf(HexVals, s[0]) + Array.IndexOf(HexVals, s[1])) / 255f;
+        float g = (16f * Array.IndexOf(HexVals, s[2]) + Array.IndexOf(HexVals, s[3])) / 255f;
+        float b = (16f * Array.IndexOf(HexVals, s[4]) + Array.IndexOf(HexVals, s[5])) / 255f;
+        return new float4(r, g, b, 1f);
     }
 }
