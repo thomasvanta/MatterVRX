@@ -92,7 +92,7 @@ public class StylesheetLoader : MonoBehaviour
             {
                 ComponentType.ReadOnly<VoxelComponent>(),
                 ComponentType.ReadWrite<MainColorComponent>(),
-                ComponentType.ReadWrite<OutlineColorComponent>()
+                ComponentType.ReadWrite<OutlineComponent>()
             };
 
             foreach (var k in cssCorrespondance)
@@ -109,10 +109,10 @@ public class StylesheetLoader : MonoBehaviour
 
         public static float4 ParseHexColor(string colorString)
         {
-            string s = colorString.Trim('#').Trim();
-            float r = 16 * Array.IndexOf(HexVals, s[0]) + Array.IndexOf(HexVals, s[1]) / 255f;
-            float g = 16 * Array.IndexOf(HexVals, s[2]) + Array.IndexOf(HexVals, s[3]) / 255f;
-            float b = 16 * Array.IndexOf(HexVals, s[4]) + Array.IndexOf(HexVals, s[5]) / 255f;
+            string s = colorString.Trim().Trim('#');
+            float r = (16f * Array.IndexOf(HexVals, s[0]) + Array.IndexOf(HexVals, s[1])) / 255f;
+            float g = (16f * Array.IndexOf(HexVals, s[2]) + Array.IndexOf(HexVals, s[3])) / 255f;
+            float b = (16f * Array.IndexOf(HexVals, s[4]) + Array.IndexOf(HexVals, s[5])) / 255f;
             return new float4(r, g, b, 1f);
         }
     }

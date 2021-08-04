@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class CSSSystem : ComponentSystem
 {
-    public static bool applyCSS = false;
+    public static bool applyCSS = true;
 
     protected override void OnUpdate()
     {
@@ -21,8 +21,8 @@ public class CSSSystem : ComponentSystem
 
             NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
             NativeArray<VoxelComponent> voxels = query.ToComponentDataArray<VoxelComponent>(Allocator.Temp);
-            NativeArray<OutlineColorComponent> outlines = query.ToComponentDataArray<OutlineColorComponent>(Allocator.Temp);
-            NativeArray<MainColorComponent> colors = query.ToComponentDataArray<MainColorComponent>(Allocator.Temp);
+            NativeArray<OutlineComponent> outlines = query.ToComponentDataArray<OutlineComponent>(Allocator.Temp);
+            //NativeArray<MainColorComponent> colors = query.ToComponentDataArray<MainColorComponent>(Allocator.Temp);
 
             for (int i = 0; i < entities.Length; i++)
             {
@@ -30,7 +30,7 @@ public class CSSSystem : ComponentSystem
                 bool apply = true;
                 foreach (var k in style.Conditions)
                 {
-                    if (k.Key.Contains("mana_lt") && voxel.value >= float.Parse(k.Value, CultureInfo.InvariantCulture)) apply = false;
+                    if (k.Key.Contains("value_lt") && voxel.value >= float.Parse(k.Value, CultureInfo.InvariantCulture)) apply = false;
                     else if (k.Key.Contains("annotated"))
                     {
                         int a = 0;
@@ -52,7 +52,7 @@ public class CSSSystem : ComponentSystem
                 foreach (var k in style.Attributes)
                 {
                     if (k.Key.Contains("outline-color")) PostUpdateCommands.SetComponent(entities[i],
-                        new OutlineColorComponent { value = StylesheetLoader.StyleClass.ParseHexColor(k.Value) }
+                        new OutlineComponent { isSelected = outlines[i].isSelected, color = StylesheetLoader.StyleClass.ParseHexColor(k.Value) }
                     );
                     else if (k.Key.Contains("color")) PostUpdateCommands.SetComponent(entities[i],
                         new MainColorComponent { value = StylesheetLoader.StyleClass.ParseHexColor(k.Value) }
@@ -63,7 +63,7 @@ public class CSSSystem : ComponentSystem
             entities.Dispose();
             voxels.Dispose();
             outlines.Dispose();
-            colors.Dispose();
+            //colors.Dispose();
         }
     }
 }

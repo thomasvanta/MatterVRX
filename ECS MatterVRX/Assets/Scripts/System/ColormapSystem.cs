@@ -16,6 +16,9 @@ public class ColormapSystem : JobComponentSystem
 
         }).Schedule(inputDeps);
 
+        jobHandle.Complete();
+        CSSSystem.applyCSS = true;
+
         return jobHandle;
     }
 }
