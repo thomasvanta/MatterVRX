@@ -58,17 +58,21 @@ public class EcsSpawner : MonoBehaviour
         }
 
         Dictionary<int3, int4> annotations = new Dictionary<int3, int4>();
-        StreamReader reader = new StreamReader("Assets/Resources/Saves/" + fileName.Split('.')[0] + ".txt");
-        string line;
-        while ((line = reader.ReadLine()) != null)
+        string annotationPath = "Assets/Resources/Saves/" + fileName.Split('.')[0] + ".txt";
+        if (File.Exists(annotationPath))
         {
-            var halfs = line.Split(':');
-            var coords = halfs[0].Split(',');
-            int3 k = new int3(int.Parse(coords[0]), int.Parse(coords[1]), int.Parse(coords[2]));
-            coords = halfs[1].Split(',');
-            int4 v = new int4(int.Parse(coords[0]), int.Parse(coords[1]), int.Parse(coords[2]), int.Parse(coords[3]));
+            StreamReader reader = new StreamReader(annotationPath);
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                var halfs = line.Split(':');
+                var coords = halfs[0].Split(',');
+                int3 k = new int3(int.Parse(coords[0]), int.Parse(coords[1]), int.Parse(coords[2]));
+                coords = halfs[1].Split(',');
+                int4 v = new int4(int.Parse(coords[0]), int.Parse(coords[1]), int.Parse(coords[2]), int.Parse(coords[3]));
 
-            annotations.Add(k, v);
+                annotations.Add(k, v);
+            }
         }
 
         for (int x = 0; x < sizeX; x++)

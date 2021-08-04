@@ -47,6 +47,7 @@ public class DictationEngine : MonoBehaviour
         Debug.Log("Dictation result: " + text);
         records[currentIndex] = text;
         SaveSystem.needsSave = true;
+        CSSSystem.applyCSS = true;
         CloseDictationEngine();
     }
 
