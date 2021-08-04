@@ -21,6 +21,7 @@ public class CSSSystem : ComponentSystem
         public NativeArray<MainColorComponent> colors;
 
         public EntityCommandBuffer.ParallelWriter commandBuffer;
+        public int styleNumber;
 
         public void Execute(int index)
         {
@@ -65,7 +66,7 @@ public class CSSSystem : ComponentSystem
                 {
                     var color = colors[index];
                     color.value = StylesheetLoader.ParseHexColor(value);
-                    commandBuffer.SetComponent(index, entities[index], color);
+                    commandBuffer.SetComponent(styleNumber, entities[index], color);
                 }
             }
         }
@@ -107,7 +108,8 @@ public class CSSSystem : ComponentSystem
                 voxels = voxels,
                 outlines = outlines,
                 colors = colors,
-                commandBuffer = buffer
+                commandBuffer = buffer,
+                styleNumber = i * 10
             };
 
             jobHandle = job.Schedule(voxels.Length, 1, jobHandle);
