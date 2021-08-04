@@ -12,9 +12,9 @@ public class DictationEngine : MonoBehaviour
     private static List<string> records = new List<string>();
     public static int currentIndex = -1;
 
-    private void Awake()
+    private void Start()
     {
-        LoadRecords();
+        LoadRecords(DataReader.parsedNiftiName + "_recordings.txt");
     }
 
     private void DictationRecognizer_OnDictationHypothesis(string text)
@@ -59,7 +59,7 @@ public class DictationEngine : MonoBehaviour
     private void OnApplicationQuit()
     {
         CloseDictationEngine();
-        SaveRecords();
+        SaveRecords(DataReader.parsedNiftiName + "_recordings.txt");
     }
 
     public void StartDictationEngine()
@@ -99,7 +99,7 @@ public class DictationEngine : MonoBehaviour
         return records[i];
     }
 
-    private void SaveRecords(string fileName = "recordings.txt")
+    private void SaveRecords(string fileName)
     {
         string path = "Assets/Resources/Saves/" + fileName;
         StreamWriter writer = new StreamWriter(path, false, System.Text.Encoding.UTF8);
@@ -113,9 +113,10 @@ public class DictationEngine : MonoBehaviour
         writer.Close();
     }
 
-    private void LoadRecords(string fileName = "recordings.txt")
+    private void LoadRecords(string fileName)
     {
         string path = "Assets/Resources/Saves/" + fileName;
+        if (!File.Exists(path)) return;
         StreamReader reader = new StreamReader(path);
 
         string line;
