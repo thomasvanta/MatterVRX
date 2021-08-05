@@ -94,9 +94,11 @@ public class Raycast : MonoBehaviour
                 else entityManager.AddComponent<SelectedFlag>(hit);
 
                 isHitSelected = !isHitSelected;
+                CSSSystem.applyCSS = true;
             }
 
-            float4 color = isHitSelected ? new float4(1, 1, 0, 1) : new float4(1, 1, 1, 1);
+            float4 prevColor = entityManager.GetComponentData<OutlineComponent>(hit).color;
+            float4 color = isHitSelected ? prevColor : new float4(1, 1, 1, 1);
             entityManager.SetComponentData(hit, new OutlineComponent { isSelected = true, color = color });
 
             lastEntity = hit;

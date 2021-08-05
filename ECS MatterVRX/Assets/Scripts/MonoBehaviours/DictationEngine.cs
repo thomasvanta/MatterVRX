@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Windows.Speech;
 using System.Collections.Generic;
+using System.IO;
 
 public class DictationEngine : MonoBehaviour
 {
@@ -10,6 +11,11 @@ public class DictationEngine : MonoBehaviour
 
     private static List<string> records = new List<string>();
     public static int currentIndex = -1;
+
+    private void Start()
+    {
+        LoadRecords(DataReader.parsedNiftiName + "_recordings.txt");
+    }
 
     private void DictationRecognizer_OnDictationHypothesis(string text)
     {
@@ -40,6 +46,8 @@ public class DictationEngine : MonoBehaviour
     {
         Debug.Log("Dictation result: " + text);
         records[currentIndex] = text;
+        SaveSystem.needsSave = true;
+        CSSSystem.applyCSS = true;
         CloseDictationEngine();
     }
 
@@ -51,6 +59,7 @@ public class DictationEngine : MonoBehaviour
     private void OnApplicationQuit()
     {
         CloseDictationEngine();
+        SaveRecords(DataReader.parsedNiftiName + "_recordings.txt");
     }
 
     public void StartDictationEngine()
@@ -88,5 +97,33 @@ public class DictationEngine : MonoBehaviour
     {
         if (i < 0) return "";
         return records[i];
+    }
+
+    private void SaveRecords(string fileName)
+    {
+        string path = "Assets/Resources/Saves/" + fileName;
+        StreamWriter writer = new StreamWriter(path, false, System.Text.Encoding.UTF8);
+
+        foreach (string line in records)
+        {
+            print(line);
+            writer.WriteLine(line);
+        }
+
+        writer.Close();
+    }
+
+    private void LoadRecords(string fileName)
+    {
+        string path = "Assets/Resources/Saves/" + fileName;
+        if (!File.Exists(path)) return;
+        StreamReader reader = new StreamReader(path);
+
+        string line;
+        while ((line = reader.ReadLine()) != null)
+        {
+            records.Add(line);
+            currentIndex++;
+        }
     }
 }

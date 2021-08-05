@@ -1,0 +1,15 @@
+selected {
+    outline-color: #ff0000;
+}
+
+map:hot selected {
+    outline-color: #0000ff;
+}
+
+value_lt:0.5 {
+    color: #00ff00;
+}
+
+annotated:true {
+    color: #ff00ff;
+}

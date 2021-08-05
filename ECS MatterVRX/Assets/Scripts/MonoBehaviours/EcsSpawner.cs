@@ -7,6 +7,7 @@ using Unity.Collections;
 using Unity.Physics;
 using E7.ECS.LineRenderer;
 using System.Collections.Generic;
+using System.IO;
 
 public class EcsSpawner : MonoBehaviour
 {
@@ -21,11 +22,10 @@ public class EcsSpawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (wholeFile) fullLoad();
-        else LimitedLoad();
+        Load("5tt.nii");
     }
 
-    void LimitedLoad()
+    void Load(string fileName = "T1w_acpc_dc_restore_brain.nii.gz")
     {
         EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
@@ -41,21 +41,47 @@ public class EcsSpawner : MonoBehaviour
             typeof(OutlineComponent)
             );
 
-        //NativeArray<Entity> entities = new NativeArray<Entity>(size * size * size, Allocator.Temp);
-        //entityManager.CreateEntity(voxelArchetype, entities);
-
         float maxAmp;
-        Nifti.NET.Nifti<float> nifti = DataReader.ParseNifti(out maxAmp);
+        Nifti.NET.Nifti<float> nifti = DataReader.ParseNifti(out maxAmp, fileName);
         Debug.Log("dimensions : " + nifti.Dimensions[0] + " ; " + nifti.Dimensions[1] + " ; " + nifti.Dimensions[2]);
 
-        //int size2 = size * size;
-        for (int x = 0; x < size; x++)
+        int sizeX = size;
+        int sizeY = size;
+        int sizeZ = size;
+        int offset = 50;
+        if (wholeFile)
         {
-            for (int y = 0; y < size; y++)
+            sizeX = nifti.Dimensions[0];
+            sizeY = nifti.Dimensions[1];
+            sizeZ = nifti.Dimensions[2];
+            offset = 0;
+        }
+
+        Dictionary<int3, int4> annotations = new Dictionary<int3, int4>();
+        string annotationPath = "Assets/Resources/Saves/" + fileName.Split('.')[0] + ".txt";
+        if (File.Exists(annotationPath))
+        {
+            StreamReader reader = new StreamReader(annotationPath);
+            string line;
+            while ((line = reader.ReadLine()) != null)
             {
-                for (int z = 0; z < size; z++)
+                var halfs = line.Split(':');
+                var coords = halfs[0].Split(',');
+                int3 k = new int3(int.Parse(coords[0]), int.Parse(coords[1]), int.Parse(coords[2]));
+                coords = halfs[1].Split(',');
+                int4 v = new int4(int.Parse(coords[0]), int.Parse(coords[1]), int.Parse(coords[2]), int.Parse(coords[3]));
+
+                annotations.Add(k, v);
+            }
+        }
+
+        for (int x = 0; x < sizeX; x++)
+        {
+            for (int y = 0; y < sizeY; y++)
+            {
+                for (int z = 0; z < sizeZ; z++)
                 {
-                    float voxelValue = nifti[50 + x, 50 + y, 50 + z] / maxAmp;
+                    float voxelValue = nifti[offset + x, offset + y, offset + z] / maxAmp;
                     if (voxelValue <= 0) continue;
 
                     Entity entity = entityManager.CreateEntity(voxelArchetype); //entities[x + y * size + z * size2];
@@ -68,6 +94,10 @@ public class EcsSpawner : MonoBehaviour
                     float scale = voxelValue <= 0 ? minSize : UnityEngine.Random.Range(minSize, maxSize);
                     entityManager.SetComponentData(entity, new Scale { Value = scale });
 
+                    int3 pos = new int3(x, y, z);
+                    int4 annot = new int4(-1, -1, -1, -1);
+                    if (annotations.ContainsKey(pos)) annot = annotations[pos];
+
                     entityManager.SetComponentData(entity, new VoxelComponent
                     {
                         basePosition = new float3(x, y, z),
@@ -75,7 +105,7 @@ public class EcsSpawner : MonoBehaviour
                         filtered = false,
                         value = voxelValue,
                         //annotationsIds = new DynamicBuffer<BufferInt>()
-                        annotationsIds = new int4(-1, -1, -1, -1)
+                        annotationsIds = annot
                     });
 
                     entityManager.SetComponentData(entity, new OutlineComponent { isSelected = false, color = new float4(1, 1, 1, 1) });
@@ -92,69 +122,6 @@ public class EcsSpawner : MonoBehaviour
         //entities.Dispose();
 
         //GenerateIntLines(ref entityManager);
-    }
-
-    private void fullLoad()
-    {
-        EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-
-        EntityArchetype voxelArchetype = entityManager.CreateArchetype(
-            typeof(VoxelComponent),
-            typeof(Translation),
-            typeof(Scale),
-            typeof(RenderMesh),
-            typeof(LocalToWorld),
-            typeof(RenderBounds),
-            typeof(MainColorComponent),
-            typeof(OutlineColorComponent),
-            typeof(OutlineComponent)
-            );
-
-
-        float maxAmp;
-        Nifti.NET.Nifti<float> nifti = DataReader.ParseNifti(out maxAmp);
-        Debug.Log("dimensions : " + nifti.Dimensions[0] + " ; " + nifti.Dimensions[1] + " ; " + nifti.Dimensions[2]);
-
-
-        for (int x = 0; x < nifti.Dimensions[0]; x++)
-        {
-            for (int y = 0; y < nifti.Dimensions[1]; y++)
-            {
-                for (int z = 0; z < nifti.Dimensions[2]; z++)
-                {
-                    float voxelValue = nifti[x, y, z] / maxAmp;
-                    if (voxelValue <= 0) continue;
-
-                    Entity entity = entityManager.CreateEntity(voxelArchetype);
-                    entityManager.SetComponentData(entity, new Translation { Value = new float3(x, y, z) });
-
-                    Vector4 color = DataReader.ConvertAmplitudeToColor(voxelValue, DataReader.ColorMap.Grey);
-                    entityManager.SetComponentData(entity, new MainColorComponent { value = color });
-                    entityManager.SetComponentData(entity, new OutlineColorComponent { value = color });
-
-                    float scale = voxelValue <= 0 ? minSize : UnityEngine.Random.Range(minSize, maxSize);
-                    entityManager.SetComponentData(entity, new Scale { Value = scale });
-
-                    entityManager.SetComponentData(entity, new VoxelComponent
-                    {
-                        basePosition = new float3(x, y, z),
-                        baseScale = scale,
-                        filtered = false,
-                        value = voxelValue,
-                        //annotationsIds = new DynamicBuffer<BufferInt>()
-                        annotationsIds = new int4(-1, -1, -1, -1)
-                    });
-
-                    entityManager.SetComponentData(entity, new OutlineComponent { isSelected = false, color = new float4(1, 1, 1, 1) });
-
-                    entityManager.SetSharedComponentData(entity, new RenderMesh
-                    {
-                        mesh = mesh,
-                        material = voxelMaterial
-                    });
-                }
-            }
-        }
     }
 
     private void GenerateIntLines(ref EntityManager entityManager)
