@@ -14,7 +14,7 @@
 /*/Assets/SteamVR/
 /*/Assets/SteamVR_Input/
 /*/Assets/SteamVR_Resources/
-/*/Assets/Obj/ 
+/*/Assets/Obj/*.obj* 
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/[Aa]ssets/**/*.meta
