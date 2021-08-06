@@ -56,14 +56,14 @@ public class CSSSystem : ComponentSystem
                 if (style.AttributeNames[i] < 0) break;
                 var key = StylesheetLoader.AllAttributeNames[style.AttributeNames[i]];
                 var value = StylesheetLoader.AllAttributesValues[style.AttributeValues[i]];
-                if (key.Contains("outline-color") && !modified["outline-color"].ToArray().Contains(entities[index]))
+                if (key.Equals("outline-color") && !modified["outline-color"].ToArray().Contains(entities[index]))
                 {
                     var outline = outlines[index];
                     outline.color = StylesheetLoader.ParseHexColor(value);
                     modified["outline-color"].Add(entities[index]);
                     commandBuffer.SetComponent(index, entities[index], outline);
                 }
-                else if (key.Contains("color"))
+                else if (key.Equals("color"))
                 {
                     var color = colors[index];
                     color.value = StylesheetLoader.ParseHexColor(value);
