@@ -22,8 +22,8 @@ These are the currently implemented buttons on this panel :
 
 ## Configuration File
 Located at ECS MatterVRX/Assets/Configutation/BaseConfig.xml, this file contains editable options for loading and navigating :
-- **zoom factor** :
-- **zoom center offset** :
+- **zoom factor** : the speed at which the voxel cluster is zoomed in or out
+- **zoom center offset** : the distance between the user head and the center point of the zoom 
 - **render distance** : the distance, expressed in *voxels*, beyond which voxels do not appear
 - **selection distance** : the distance, expressed in *voxels*, beyond which voxels cannot be pointed nor selected
 - **vertical speed** : the speed at which voxels move vertically
