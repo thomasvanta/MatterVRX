@@ -15,7 +15,7 @@ public class EcsSpawner : MonoBehaviour
     [SerializeField] private int size = 10;
     [SerializeField] private float minSize = 0.05f;
     [SerializeField] private float maxSize = 0.5f;
-    [SerializeField] private Mesh mesh;
+    [SerializeField] private Mesh[] meshes;
     [SerializeField] private UnityEngine.Material voxelMaterial;
     [SerializeField] private UnityEngine.Material lineMaterial;
 
@@ -33,6 +33,7 @@ public class EcsSpawner : MonoBehaviour
             typeof(VoxelComponent),
             typeof(Translation),
             typeof(Scale),
+            typeof(Rotation),
             typeof(RenderMesh),
             typeof(LocalToWorld),
             typeof(RenderBounds),
@@ -110,9 +111,13 @@ public class EcsSpawner : MonoBehaviour
 
                     entityManager.SetComponentData(entity, new OutlineComponent { isSelected = false, color = new float4(1, 1, 1, 1) });
 
+                    int mesh = UnityEngine.Random.Range(0, meshes.Length);
+                    if (mesh == 0) entityManager.SetComponentData(entity, new Rotation { Value = Quaternion.Euler(-15, 0, 90) });
+                    else if (mesh == 2) entityManager.SetComponentData(entity, new Rotation { Value = Quaternion.Euler(45, 45, 0) });
+
                     entityManager.SetSharedComponentData(entity, new RenderMesh
                     {
-                        mesh = mesh,
+                        mesh = meshes[mesh],
                         material = voxelMaterial
                     });
                 }
