@@ -7,25 +7,34 @@ using System.IO;
 
 public class ConfigurationLoader : MonoBehaviour
 {
+    [XmlRoot("LoadRegion")]
+    public class LoadRegion
+    {
+        public int x;
+        public int y;
+        public int z;
+        public int sizeX;
+        public int sizeY;
+        public int sizeZ;
+    }
+
     [XmlRoot("BaseConfig")]
     public class BaseConfig
     {
         public float zoomFactor;
-
         public float zoomCenterOffset;
-
         public float renderDist;
-
         public float selectionDist;
-
         public float verticalSpeed;
-
         public float horizontalSpeed;
+        public string fileName;
+        public bool loadWhole;
+        public LoadRegion LoadRegion;
     }
     
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         var serializer = new XmlSerializer(typeof(BaseConfig));
         var stream = new FileStream(Path.Combine(Application.dataPath,"Configuration/BaseConfig.xml"), FileMode.Open);
@@ -38,6 +47,9 @@ public class ConfigurationLoader : MonoBehaviour
         InputManager.colliderDist = container.selectionDist;
         InputManager.verticalSpeed = container.verticalSpeed;
         InputManager.horizontalSpeed = container.horizontalSpeed;
+        EcsSpawner.filename = container.fileName;
+        EcsSpawner.loadWhole = container.loadWhole;
+        EcsSpawner.region = container.LoadRegion;
     }
 
 }
