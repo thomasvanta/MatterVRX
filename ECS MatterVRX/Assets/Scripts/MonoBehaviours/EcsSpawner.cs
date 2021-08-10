@@ -11,18 +11,21 @@ using System.IO;
 
 public class EcsSpawner : MonoBehaviour
 {
-    [SerializeField] private bool wholeFile = false;
-    [SerializeField] private int size = 10;
+    //[SerializeField] private bool wholeFile = false;
+    //[SerializeField] private int size = 10;
     [SerializeField] private float minSize = 0.05f;
     [SerializeField] private float maxSize = 0.5f;
     [SerializeField] private Mesh[] meshes;
     [SerializeField] private UnityEngine.Material voxelMaterial;
     [SerializeField] private UnityEngine.Material lineMaterial;
+    public static string filename;
+    public static bool loadWhole;
+    public static ConfigurationLoader.LoadRegion region;
 
     // Start is called before the first frame update
     void Start()
     {
-        Load("5tt.nii");
+        Load(filename);
     }
 
     void Load(string fileName = "T1w_acpc_dc_restore_brain.nii.gz")
@@ -46,16 +49,22 @@ public class EcsSpawner : MonoBehaviour
         Nifti.NET.Nifti<float> nifti = DataReader.ParseNifti(out maxAmp, fileName);
         Debug.Log("dimensions : " + nifti.Dimensions[0] + " ; " + nifti.Dimensions[1] + " ; " + nifti.Dimensions[2]);
 
-        int sizeX = size;
-        int sizeY = size;
-        int sizeZ = size;
-        int offset = 50;
-        if (wholeFile)
+        int offX, offY, offZ, sizeX, sizeY, sizeZ;
+        if (loadWhole)
         {
+            offX = 0; offY = 0; offZ = 0;
             sizeX = nifti.Dimensions[0];
             sizeY = nifti.Dimensions[1];
             sizeZ = nifti.Dimensions[2];
-            offset = 0;
+        }
+        else
+        {
+            offX = region.x;
+            offY = region.y;
+            offZ = region.z;
+            sizeX = region.sizeX;
+            sizeY = region.sizeY;
+            sizeZ = region.sizeZ;
         }
 
         Dictionary<int3, int4> annotations = new Dictionary<int3, int4>();
@@ -82,7 +91,7 @@ public class EcsSpawner : MonoBehaviour
             {
                 for (int z = 0; z < sizeZ; z++)
                 {
-                    float voxelValue = nifti[offset + x, offset + y, offset + z] / maxAmp;
+                    float voxelValue = nifti[offX + x, offY + y, offZ + z] / maxAmp;
                     if (voxelValue <= 0) continue;
 
                     Entity entity = entityManager.CreateEntity(voxelArchetype); //entities[x + y * size + z * size2];

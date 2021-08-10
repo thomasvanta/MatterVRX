@@ -73,7 +73,6 @@ public class StylesheetLoader : MonoBehaviour
 
         for (int i = 0; i < formattedClasses.Length; i++)
         {
-            print(formattedClasses[i]);
             var c = FillClass(formattedClasses[i]);
             if (c.Name >= 0) classes.Add(c);
         }
