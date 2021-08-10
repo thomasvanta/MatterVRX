@@ -19,3 +19,15 @@ These are the currently implemented buttons on this panel :
   - *On Value* : this filter uses the slider beneath the button : all voxels which have a value less than the slider's are disabled
 - **Colormaps** : a dropdown menu which allows one to change the colormap used for coloring voxels. There currently are 4 colormaps : *Grey, Hot, Cool, Jet*.
 - **Record annotation** : starts a voice recognition engine which converts voice to text and saves the annotation to all selected voxels
+
+## Configuration File
+Located at ECS MatterVRX/Assets/Configutation/BaseConfig.xml, this file contains editable options for loading and navigating :
+- **zoom factor** :
+- **zoom center offset** :
+- **render distance** : the distance, expressed in *voxels*, beyond which voxels do not appear
+- **selection distance** : the distance, expressed in *voxels*, beyond which voxels cannot be pointed nor selected
+- **vertical speed** : the speed at which voxels move vertically
+- **horizontal speed** : the speed at which voxels move horizontally
+- **file name** : the name of the file to be loaded. It must be a *.nii* or a *.nii.gz*, and must be located in ECS MatterVRX/Assets/Resources/
+- **load whole** : whether the file should be fully loaded into the software or not
+- **load region**: if the file is not fully loaded, the loaded cuboid within the file
