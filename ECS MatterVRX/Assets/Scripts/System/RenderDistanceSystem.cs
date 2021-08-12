@@ -66,7 +66,7 @@ public class EntityDisabler : ComponentSystem
         var queryDesc = new EntityQueryDesc
         {
             None = new ComponentType[] { ComponentType.ReadOnly<Disabled>() },
-            All = new ComponentType[]  { ComponentType.ReadOnly<Translation>() }
+            All = new ComponentType[]  { ComponentType.ReadOnly<Translation>(), ComponentType.ReadOnly<VoxelComponent>() }
         };
         query = GetEntityQuery(queryDesc);
         base.OnCreate();

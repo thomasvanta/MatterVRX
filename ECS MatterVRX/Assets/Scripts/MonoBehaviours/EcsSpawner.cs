@@ -28,6 +28,15 @@ public class EcsSpawner : MonoBehaviour
         Load(filename);
     }
 
+    float3 GetMillimeters(int x, int y, int z, Nifti.NET.Nifti<float> nifti)
+    {
+        return new float3(
+                        x * nifti.Header.srow_x[0] + y * nifti.Header.srow_x[1] + z * nifti.Header.srow_x[2] + nifti.Header.srow_x[3],
+                        x * nifti.Header.srow_y[0] + y * nifti.Header.srow_y[1] + z * nifti.Header.srow_y[2] + nifti.Header.srow_y[3],
+                        x * nifti.Header.srow_z[0] + y * nifti.Header.srow_z[1] + z * nifti.Header.srow_z[2] + nifti.Header.srow_z[3]
+                );
+    }
+
     void Load(string fileName = "T1w_acpc_dc_restore_brain.nii.gz")
     {
         EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
@@ -85,6 +94,9 @@ public class EcsSpawner : MonoBehaviour
             }
         }
 
+        float3 startOffset = GetMillimeters(offX, offY, offZ, nifti);
+        float3 max = GetMillimeters(offX + sizeX, offY + sizeY, offZ + sizeZ, nifti);
+
         for (int x = 0; x < sizeX; x++)
         {
             for (int y = 0; y < sizeY; y++)
@@ -94,14 +106,16 @@ public class EcsSpawner : MonoBehaviour
                     float voxelValue = nifti[offX + x, offY + y, offZ + z] / maxAmp;
                     if (voxelValue <= 0) continue;
 
+                    float3 millimetersPos = GetMillimeters(offX + x, offY + y, offZ + z, nifti);
+
                     Entity entity = entityManager.CreateEntity(voxelArchetype); //entities[x + y * size + z * size2];
-                    entityManager.SetComponentData(entity, new Translation { Value = new float3(x, y, z) });
+                    entityManager.SetComponentData(entity, new Translation { Value = millimetersPos - startOffset });
 
                     Vector4 color = DataReader.ConvertAmplitudeToColor(voxelValue, DataReader.ColorMap.Grey);
                     entityManager.SetComponentData(entity, new MainColorComponent { value = color });
                     entityManager.SetComponentData(entity, new OutlineColorComponent { value = color });
 
-                    float scale = voxelValue <= 0 ? minSize : UnityEngine.Random.Range(minSize, maxSize);
+                    float scale = UnityEngine.Random.Range(minSize, maxSize);
                     entityManager.SetComponentData(entity, new Scale { Value = scale });
 
                     int3 pos = new int3(x, y, z);
@@ -110,7 +124,7 @@ public class EcsSpawner : MonoBehaviour
 
                     entityManager.SetComponentData(entity, new VoxelComponent
                     {
-                        basePosition = new float3(x, y, z),
+                        basePosition = millimetersPos - startOffset,
                         baseScale = scale,
                         filtered = false,
                         value = voxelValue,
@@ -136,6 +150,7 @@ public class EcsSpawner : MonoBehaviour
         //entities.Dispose();
 
         //GenerateIntLines(ref entityManager);
+        GenerateFloatLines(ref entityManager, startOffset, max);
     }
 
     private void GenerateIntLines(ref EntityManager entityManager)
@@ -162,7 +177,7 @@ public class EcsSpawner : MonoBehaviour
             {
                 float3 dv = new float3(line.line[i].x, line.line[i].y, line.line[i].z);
 
-                float lineWidth = 0.1f * line.strength;
+                float lineWidth = 0.05f * line.strength;
                 entityManager.SetComponentData(lines[i], new LineComponent { baseFrom = v, baseTo = v + dv, filtered = false, baseWidth = lineWidth });
                 entityManager.SetComponentData(lines[i], new LineSegment(v, v + dv));
                 entityManager.SetSharedComponentData(lines[i], new LineStyle { material = lineMaterial });
@@ -174,5 +189,57 @@ public class EcsSpawner : MonoBehaviour
 
             lines.Dispose();
         }
+    }
+
+    private void GenerateFloatLines(ref EntityManager entityManager, float3 startOffet, float3 max)
+    {
+        EntityArchetype lineArchetype = entityManager.CreateArchetype(
+            typeof(LineComponent),
+            typeof(LineSegment),
+            typeof(LineStyle),
+            typeof(MainColorComponent),
+            typeof(OutlineColorComponent)
+            );
+
+        List<DataReader.FloatStreamline> streamlines = DataReader.ReadFloatLines();
+
+        foreach (DataReader.FloatStreamline line in streamlines)
+        {
+            if (line.strength <= 0 || line.line.Count <= 0) continue;
+
+            int n = line.line.Count;
+            //NativeArray<Entity> lines = entityManager.CreateEntity(lineArchetype, n, Allocator.Temp);
+
+            float3 v = new float3(line.start.x, line.start.y, line.start.z);
+            for (int i = 0; i < n; i++)
+            {
+                float3 dv = new float3(line.line[i].x, line.line[i].y, line.line[i].z);
+
+                if (SegmentIsInCube(v, dv, startOffet, max))
+                {
+                    Entity lineEntity = entityManager.CreateEntity(lineArchetype);
+                    float lineWidth = 0.05f * line.strength;
+                    entityManager.SetComponentData(lineEntity, new LineComponent { baseFrom = v - startOffet, baseTo = v + dv - startOffet, filtered = false, baseWidth = lineWidth });
+                    entityManager.SetComponentData(lineEntity, new LineSegment(v - startOffet, v + dv - startOffet));
+                    entityManager.SetSharedComponentData(lineEntity, new LineStyle { material = lineMaterial });
+                    entityManager.SetComponentData(lineEntity, new MainColorComponent { value = new float4(line.mixedColor.r / 255f, line.mixedColor.g / 255f, line.mixedColor.b / 255f, 1) });
+                    entityManager.SetComponentData(lineEntity, new OutlineColorComponent { value = new float4(0, 0, 0, 0) });
+                }
+
+                v += dv;
+            }
+
+            //lines.Dispose();
+        }
+    }
+
+    bool SegmentIsInCube(float3 v, float3 dv, float3 cubeStart, float3 cubeEnd)
+    {
+        return (v.x <= Mathf.Max(cubeStart.x, cubeEnd.x) && v.x >= Mathf.Min(cubeStart.x, cubeEnd.x) &&
+                v.y <= Mathf.Max(cubeStart.y, cubeEnd.y) && v.y >= Mathf.Min(cubeStart.y, cubeEnd.y) &&
+                v.z <= Mathf.Max(cubeStart.z, cubeEnd.z) && v.z >= Mathf.Min(cubeStart.z, cubeEnd.z)) ||
+               ((v + dv).x <= Mathf.Max(cubeStart.x, cubeEnd.x) && (v + dv).x >= Mathf.Min(cubeStart.x, cubeEnd.x) &&
+                (v + dv).y <= Mathf.Max(cubeStart.y, cubeEnd.y) && (v + dv).y >= Mathf.Min(cubeStart.y, cubeEnd.y) &&
+                (v + dv).z <= Mathf.Max(cubeStart.z, cubeEnd.z) && (v + dv).z >= Mathf.Min(cubeStart.z, cubeEnd.z));
     }
 }

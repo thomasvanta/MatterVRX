@@ -67,7 +67,6 @@ public class StylesheetLoader : MonoBehaviour
     private List<StyleClass> FillClasses(string fileName = "stylesheet.css")
     {
         string full = File.ReadAllText(Path.Combine(Application.dataPath, "Configuration/" + fileName));
-        print(full);
         var formattedClasses = full.Split('}');
         List<StyleClass> classes = new List<StyleClass>();
 

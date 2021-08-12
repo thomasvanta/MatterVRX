@@ -6,12 +6,12 @@
 	<selectionDist>5</selectionDist>
 	<verticalSpeed>1</verticalSpeed>
 	<horizontalSpeed>5</horizontalSpeed>
-  <fileName>5tt.nii</fileName>
+  <fileName>T1w_acpc_dc_restore_brain.nii.gz</fileName>
   <loadWhole>false</loadWhole>
   <LoadRegion>
-    <x>50</x>
-    <y>50</y>
-    <z>50</z>
+    <x>32</x>
+    <y>65</y>
+    <z>77</z>
     <sizeX>100</sizeX>
     <sizeY>100</sizeY>
     <sizeZ>100</sizeZ>
