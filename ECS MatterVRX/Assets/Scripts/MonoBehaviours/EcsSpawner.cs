@@ -24,25 +24,25 @@ public class EcsSpawner : MonoBehaviour
 
     [SerializeField] private GameObject brainMap;
     private MeshFilter brainMesh;
-    private Transform mapIndicator;
+    private Transform mapRegion;
     private MinimapDot mapDot;
 
     // Start is called before the first frame update
     void Start()
     {
         brainMesh = brainMap.GetComponent<MeshFilter>();
-        mapIndicator = brainMap.transform.GetChild(0);
-        mapDot = mapIndicator.GetComponent<MinimapDot>();
+        mapRegion = brainMap.transform.GetChild(0);
+       // mapDot = mapIndicator.GetComponent<MinimapDot>();
         Load(filename);
     }
 
     void SetMap(float3 dimensions, float3 start, float3 chunkSize)
     {
         var size = brainMesh.sharedMesh.bounds.size;
-        mapIndicator.localPosition = start * size * brainMap.transform.localScale / dimensions;
-        mapIndicator.localScale = chunkSize * size / dimensions;
-        print("size: " + mapIndicator.localScale.ToString());
-        mapDot.SetMapScale(size / dimensions);
+        mapRegion.localPosition = start * size * brainMap.transform.localScale / dimensions;
+        mapRegion.localScale = chunkSize * size / dimensions;
+        print("size: " + mapRegion.localScale.ToString());
+        //mapDot.SetMapScale(size / dimensions);
     }
 
     float3 GetMillimeters(int x, int y, int z, Nifti.NET.Nifti<float> nifti)
