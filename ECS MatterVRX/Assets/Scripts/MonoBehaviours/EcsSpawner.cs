@@ -22,10 +22,27 @@ public class EcsSpawner : MonoBehaviour
     public static bool loadWhole;
     public static ConfigurationLoader.LoadRegion region;
 
+    [SerializeField] private GameObject brainMap;
+    private MeshFilter brainMesh;
+    private Transform mapIndicator;
+    private MinimapDot mapDot;
+
     // Start is called before the first frame update
     void Start()
     {
+        brainMesh = brainMap.GetComponent<MeshFilter>();
+        mapIndicator = brainMap.transform.GetChild(0);
+        mapDot = mapIndicator.GetComponent<MinimapDot>();
         Load(filename);
+    }
+
+    void SetMap(float3 dimensions, float3 start, float3 chunkSize)
+    {
+        var size = brainMesh.sharedMesh.bounds.size;
+        mapIndicator.localPosition = start * size * brainMap.transform.localScale / dimensions;
+        mapIndicator.localScale = chunkSize * size / dimensions;
+        print("size: " + mapIndicator.localScale.ToString());
+        mapDot.SetMapScale(size / dimensions);
     }
 
     float3 GetMillimeters(int x, int y, int z, Nifti.NET.Nifti<float> nifti)
@@ -96,6 +113,8 @@ public class EcsSpawner : MonoBehaviour
 
         float3 startOffset = GetMillimeters(offX, offY, offZ, nifti);
         float3 max = GetMillimeters(offX + sizeX, offY + sizeY, offZ + sizeZ, nifti);
+
+        SetMap(GetMillimeters(nifti.Dimensions[0], nifti.Dimensions[1], nifti.Dimensions[2], nifti), startOffset, max - startOffset);
 
         for (int x = 0; x < sizeX; x++)
         {

@@ -5,22 +5,17 @@ using Unity.Mathematics;
 
 public class MinimapDot : MonoBehaviour
 {
-    [SerializeField] private Vector3 dotScale;
-    [SerializeField] private Vector3 offset;
-    [SerializeField] private Vector3 minimapScale;
+    private float3 minimapScale;
 
-    // Start is called before the first frame update
-    void Start()
+    public void SetMapScale(float3 scale)
     {
-        transform.localScale = dotScale;
+        minimapScale = scale;
     }
 
     // Update is called once per frame
     void Update()
     {
-        Vector3 newPos = new Vector3((-InputManager.globalPosition.x + offset.x) * minimapScale.x,
-                -(-InputManager.globalPosition.z + offset.z) * minimapScale.z,
-                (-InputManager.globalPosition.y + offset.y) * minimapScale.y);
-        transform.localPosition = newPos;
+        //Vector3 dv = InputManager.direction * minimapScale;
+        //transform.localPosition += dv;
     }
 }
