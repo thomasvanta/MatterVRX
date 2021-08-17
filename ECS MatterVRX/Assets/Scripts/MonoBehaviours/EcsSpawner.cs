@@ -21,6 +21,8 @@ public class EcsSpawner : MonoBehaviour
     public static string filename;
     public static bool loadWhole;
     public static ConfigurationLoader.LoadRegion region;
+    public static bool loadStreamlines;
+    public static ConfigurationLoader.StreamlineFiles streamlineFiles;
 
     [SerializeField] private GameObject brainMap;
     private MeshFilter brainMesh;
@@ -169,7 +171,7 @@ public class EcsSpawner : MonoBehaviour
         //entities.Dispose();
 
         //GenerateIntLines(ref entityManager);
-        GenerateFloatLines(ref entityManager, startOffset, max);
+        if (loadStreamlines) GenerateFloatLines(ref entityManager, startOffset, max);
     }
 
     private void GenerateIntLines(ref EntityManager entityManager)
@@ -220,7 +222,15 @@ public class EcsSpawner : MonoBehaviour
             typeof(OutlineColorComponent)
             );
 
-        List<DataReader.FloatStreamline> streamlines = DataReader.ReadFloatLines();
+        List<DataReader.FloatStreamline> streamlines = DataReader.ReadFloatLines(
+            streamlineFiles.adjacencyMatrix,
+            streamlineFiles.assignments,
+            streamlineFiles.nodes,
+            streamlineFiles.streamlineTemplate,
+            streamlineFiles.digitsNumber,
+            streamlineFiles.size,
+            streamlineFiles.ignoreAssignmentFirstLine
+        );
 
         foreach (DataReader.FloatStreamline line in streamlines)
         {
