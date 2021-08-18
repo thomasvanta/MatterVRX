@@ -1,6 +1,8 @@
 using UnityEngine;
 using Unity.Mathematics;
 
+/* Uptade the position of the user head in the input manager
+ */
 public class InputUpdater : MonoBehaviour
 {
     [SerializeField] private Camera user;

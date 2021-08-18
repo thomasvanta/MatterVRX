@@ -11,8 +11,6 @@ using System.IO;
 
 public class EcsSpawner : MonoBehaviour
 {
-    //[SerializeField] private bool wholeFile = false;
-    //[SerializeField] private int size = 10;
     [SerializeField] private float minSize = 0.05f;
     [SerializeField] private float maxSize = 0.5f;
     [SerializeField] private Mesh[] meshes;
@@ -58,19 +56,23 @@ public class EcsSpawner : MonoBehaviour
     {
         EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
 
+        // define voxel archetype
+        // note : the voxels are spawn without collision box because of perf issues
         EntityArchetype voxelArchetype = entityManager.CreateArchetype(
-            typeof(VoxelComponent),
-            typeof(Translation),
-            typeof(Scale),
-            typeof(Rotation),
-            typeof(RenderMesh),
-            typeof(LocalToWorld),
-            typeof(RenderBounds),
-            typeof(MainColorComponent),
-            typeof(OutlineColorComponent),
-            typeof(OutlineComponent)
+            typeof(VoxelComponent), // contain initial values
+            typeof(Translation),    // position of the voxel
+            typeof(Scale),          // size of the voxel
+            typeof(Rotation),       // rotation of the voxel
+            typeof(RenderMesh),     // needed for render purpose
+            typeof(LocalToWorld),   // needed for render purpose 
+            typeof(RenderBounds),   // needed for render purpose
+            typeof(MainColorComponent), // needed for shader overide
+            typeof(OutlineColorComponent),  // needed for shader outline overide 
+            typeof(OutlineComponent)    // needed to controle the outline color
             );
 
+
+        // define loaded region
         float maxAmp;
         Nifti.NET.Nifti<float> nifti = DataReader.ParseNifti(out maxAmp, fileName);
         Debug.Log("dimensions : " + nifti.Dimensions[0] + " ; " + nifti.Dimensions[1] + " ; " + nifti.Dimensions[2]);
@@ -93,6 +95,7 @@ public class EcsSpawner : MonoBehaviour
             sizeZ = region.sizeZ;
         }
 
+        // load annotations
         Dictionary<int3, int4> annotations = new Dictionary<int3, int4>();
         string annotationPath = "Assets/Resources/Saves/" + fileName.Split('.')[0] + ".txt";
         if (File.Exists(annotationPath))
@@ -116,6 +119,7 @@ public class EcsSpawner : MonoBehaviour
 
         SetMap(GetMillimeters(nifti.Dimensions[0], nifti.Dimensions[1], nifti.Dimensions[2], nifti), startOffset, max - startOffset);
 
+        // load voxels
         for (int x = 0; x < sizeX; x++)
         {
             for (int y = 0; y < sizeY; y++)
@@ -123,14 +127,18 @@ public class EcsSpawner : MonoBehaviour
                 for (int z = 0; z < sizeZ; z++)
                 {
                     float voxelValue = nifti[offX + x, offY + y, offZ + z] / maxAmp;
-                    if (voxelValue <= 0) continue;
+                    if (voxelValue <= 0) continue; // ignore negative voxel
 
                     float3 millimetersPos = GetMillimeters(offX + x, offY + y, offZ + z, nifti);
 
-                    Entity entity = entityManager.CreateEntity(voxelArchetype); //entities[x + y * size + z * size2];
+
+                    Entity entity = entityManager.CreateEntity(voxelArchetype);
+
+
                     entityManager.SetComponentData(entity, new Translation { Value = millimetersPos - startOffset });
 
                     Vector4 color = DataReader.ConvertAmplitudeToColor(voxelValue, DataReader.ColorMap.Grey);
+
                     entityManager.SetComponentData(entity, new MainColorComponent { value = color });
                     entityManager.SetComponentData(entity, new OutlineColorComponent { value = color });
 
@@ -166,12 +174,10 @@ public class EcsSpawner : MonoBehaviour
             }
         }
 
-        //entities.Dispose();
-
-        //GenerateIntLines(ref entityManager);
         GenerateFloatLines(ref entityManager, startOffset, max);
     }
 
+    // unsed methode that aproximate steamlines to the closest voxel
     private void GenerateIntLines(ref EntityManager entityManager)
     {
         EntityArchetype lineArchetype = entityManager.CreateArchetype(
@@ -210,14 +216,15 @@ public class EcsSpawner : MonoBehaviour
         }
     }
 
+    // methode that generate line entities based on a file
     private void GenerateFloatLines(ref EntityManager entityManager, float3 startOffet, float3 max)
     {
         EntityArchetype lineArchetype = entityManager.CreateArchetype(
             typeof(LineComponent),
             typeof(LineSegment),
             typeof(LineStyle),
-            typeof(MainColorComponent),
-            typeof(OutlineColorComponent)
+            typeof(MainColorComponent),     // needed since the lines use the same shader asa the voxels
+            typeof(OutlineColorComponent)   // same
             );
 
         List<DataReader.FloatStreamline> streamlines = DataReader.ReadFloatLines();
@@ -227,7 +234,6 @@ public class EcsSpawner : MonoBehaviour
             if (line.strength <= 0 || line.line.Count <= 0) continue;
 
             int n = line.line.Count;
-            //NativeArray<Entity> lines = entityManager.CreateEntity(lineArchetype, n, Allocator.Temp);
 
             float3 v = new float3(line.start.x, line.start.y, line.start.z);
             for (int i = 0; i < n; i++)
@@ -248,7 +254,6 @@ public class EcsSpawner : MonoBehaviour
                 v += dv;
             }
 
-            //lines.Dispose();
         }
     }
 

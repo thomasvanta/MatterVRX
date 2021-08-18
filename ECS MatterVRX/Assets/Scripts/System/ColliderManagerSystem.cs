@@ -28,7 +28,7 @@ public class AddColliderSystem : ComponentSystem
     protected override void OnUpdate()
     {
         float3 userPos = InputManager.userPos;
-        float dist = InputManager.colliderDist;
+        float dist = InputManager.colliderDist * InputManager.zoomGlobal;
 
         NativeArray<Entity> entities = query.ToEntityArray(Allocator.Temp);
         NativeArray<Translation> positions = query.ToComponentDataArray<Translation>(Allocator.Temp);

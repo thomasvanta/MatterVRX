@@ -33,7 +33,6 @@ public class Zoom : MonoBehaviour
             InputManager.zoomPivot = userHead.transform.position + InputManager.zoomCenterOffset * userHead.transform.forward;
             InputManager.zoomFactor = scale;
             InputManager.zoomGlobal *= scale;
-            InputManager.colliderDist *= scale;
 
             float3 delta = InputManager.globalPosition - InputManager.zoomPivot;
             InputManager.globalPosition = InputManager.zoomPivot + scale * delta;
