@@ -36,8 +36,8 @@ Located at ECS MatterVRX/Assets/Configutation/BaseConfig.xml, this file contains
 ## git clone
 when cloning the project you may encounter the following problem
 - **Loading blocked on SteamVR_Settings.asset** : there is 2 known methods:
-  - *method 1* : wait a bit, then interrupt the loading (alt f4 or task manager). Then restart the computer
+  - *method 1* : wait a bit, then interrupt the loading (alt f4 or task manager). Then restart Unity
   - *method 2* : interrupt the loading, delete the 3 folder Assets/SteamVR*, and start the unity project again by ignoring the warning. When in the project, use the package manager to remove the SteamVr SDk, then reinstall it. If the loading block again on the SteamVR_Settings.asset, force restart Unity
 - **missing mesh** :
-  - *default mesh for the minimap* : the .obj is to big to be pushed on git, you need to ask the relevant people to give it to you. Once the .obj obtained, put the mesh on the MiniMap gameobject
+  - *default mesh for the minimap* : the .obj is to big to be pushed on git, you need to ask the relevant people to give it to you. Import the .obj in the Assets/Obj folder. Once the .obj obtained, put the mesh on the MiniMap gameobject
   - *various mesh for the voxels* : the meshes for the voxels are in Assets/Obj. You need to give them to the Voxels ECS Spawner -> Ecs Spawner (Script) -> Meshes (Array). Currently, the distribution of shapes is random, with a density defined by the proportions in the array (the distribution used is [tetrahedron, diamond, cube, cube], in this order) 
