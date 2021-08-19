@@ -51,7 +51,7 @@ public class ConfigurationLoader : MonoBehaviour
     void Awake()
     {
         var serializer = new XmlSerializer(typeof(BaseConfig));
-        var stream = new FileStream(Path.Combine(Application.dataPath,"Configuration/BaseConfig.xml"), FileMode.Open);
+        var stream = new FileStream(Path.Combine(Application.streamingAssetsPath, "Configuration/BaseConfig.xml"), FileMode.Open);
         var container = serializer.Deserialize(stream) as BaseConfig;
         stream.Close();
 

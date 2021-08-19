@@ -32,7 +32,7 @@ public static class DataReader
     {
         v = Vector3Int.zero;
         List<Vector3Int> lines = new List<Vector3Int>();
-        string path = "Assets/Resources/" + fileName;
+        string path = Application.streamingAssetsPath + "/Resources/" + fileName;
         StreamReader reader = new StreamReader(path);
 
         string line1 = reader.ReadLine();
@@ -63,7 +63,7 @@ public static class DataReader
     {
         v = Vector3.zero;
         List<Vector3> lines = new List<Vector3>();
-        string path = "Assets/Resources/" + fileName;
+        string path = Application.streamingAssetsPath + "/Resources/" + fileName;
         StreamReader reader = new StreamReader(path);
 
         string line1 = reader.ReadLine();
@@ -93,7 +93,7 @@ public static class DataReader
     {
         int[,] matrix = new int[84, 84];
         char fieldSeparator = ',';
-        string path = "Assets/Resources/" + fileName;
+        string path = Application.streamingAssetsPath + "/Resources/" + fileName;
         StreamReader reader = new StreamReader(path);
 
         max = 0;
@@ -116,7 +116,7 @@ public static class DataReader
     public static List<Tuple<int, int>> ReadAssignments(string fileName, bool ignoreFirstLine = true)
     {
         List<Tuple<int, int>> list = new List<Tuple<int, int>>();
-        string path = "Assets/Resources/" + fileName;
+        string path = Application.streamingAssetsPath + "/Resources/" + fileName;
         StreamReader reader = new StreamReader(path);
 
         string line;
@@ -161,7 +161,7 @@ public static class DataReader
 
         Color[] colors = new Color[size];
         names = new string[size];
-        string path = "Assets/Resources/" + fileName;
+        string path = Application.streamingAssetsPath + "/Resources/" + fileName;
         StreamReader reader = new StreamReader(path);
 
         string line;
@@ -204,7 +204,7 @@ public static class DataReader
         string fillerZeros = new String('0', digitsNumber - 1);
         string linePath = streamlineFileNameTemplate + fillerZeros + i.ToString() + ".txt";
 
-        while (File.Exists("Assets/Resources/" + linePath))
+        while (File.Exists(Application.streamingAssetsPath + "/Resources/" + linePath))
         {
             Tuple<int, int> lineEnd = lineEnds[i];
             IntStreamline line = new IntStreamline();
@@ -251,7 +251,7 @@ public static class DataReader
         string fillerZeros = new String('0', digitsNumber - 1);
         string linePath = streamlineFileNameTemplate + fillerZeros + i.ToString() + ".txt";
 
-        while (File.Exists("Assets/Resources/" + linePath))
+        while (File.Exists(Application.streamingAssetsPath + "/Resources/" + linePath))
         {
             Tuple<int, int> lineEnd = lineEnds[i];
             FloatStreamline line = new FloatStreamline();
@@ -324,7 +324,7 @@ public static class DataReader
     public static Nifti.NET.Nifti<float> ParseNifti(out float maxAmp, string fileName = "T1w_acpc_dc_restore_brain.nii.gz")
     {
         parsedNiftiName = fileName.Split('.')[0];
-        string path = "Assets/Resources/" + fileName;
+        string path = Application.streamingAssetsPath + "/Resources/" + fileName;
         var nii = Nifti.NET.NiftiFile.Read(path);
 
         if (!nii.IsType(typeof(float)))
