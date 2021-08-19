@@ -16,4 +16,14 @@
     <sizeY>100</sizeY>
     <sizeZ>100</sizeZ>
   </LoadRegion>
+  <loadStreamlines>true</loadStreamlines>
+  <StreamlineFiles>
+    <adjacencyMatrix>connectome_1M.csv</adjacencyMatrix>
+    <size>84</size>
+    <assignments>assignments_radial_1M.csv</assignments>
+    <ignoreAssignmentFirstLine>true</ignoreAssignmentFirstLine>
+    <nodes>fs_default_mod.txt</nodes>
+    <streamlineTemplate>data/output-</streamlineTemplate>
+    <digitsNumber>7</digitsNumber>
+  </StreamlineFiles>
 </BaseConfig>		

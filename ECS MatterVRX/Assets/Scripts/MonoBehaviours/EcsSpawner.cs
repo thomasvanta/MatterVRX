@@ -19,6 +19,8 @@ public class EcsSpawner : MonoBehaviour
     public static string filename;
     public static bool loadWhole;
     public static ConfigurationLoader.LoadRegion region;
+    public static bool loadStreamlines;
+    public static ConfigurationLoader.StreamlineFiles streamlineFiles;
 
     [SerializeField] private GameObject brainMap;
     private MeshFilter brainMesh;
@@ -174,7 +176,7 @@ public class EcsSpawner : MonoBehaviour
             }
         }
 
-        GenerateFloatLines(ref entityManager, startOffset, max);
+        if (loadStreamlines) GenerateFloatLines(ref entityManager, startOffset, max);
     }
 
     // unsed methode that aproximate steamlines to the closest voxel
@@ -227,7 +229,15 @@ public class EcsSpawner : MonoBehaviour
             typeof(OutlineColorComponent)   // same
             );
 
-        List<DataReader.FloatStreamline> streamlines = DataReader.ReadFloatLines();
+        List<DataReader.FloatStreamline> streamlines = DataReader.ReadFloatLines(
+            streamlineFiles.adjacencyMatrix,
+            streamlineFiles.assignments,
+            streamlineFiles.nodes,
+            streamlineFiles.streamlineTemplate,
+            streamlineFiles.digitsNumber,
+            streamlineFiles.size,
+            streamlineFiles.ignoreAssignmentFirstLine
+        );
 
         foreach (DataReader.FloatStreamline line in streamlines)
         {

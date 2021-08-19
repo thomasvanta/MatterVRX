@@ -18,6 +18,18 @@ public class ConfigurationLoader : MonoBehaviour
         public int sizeZ;
     }
 
+    [XmlRoot("StreamlineFiles")]
+    public class StreamlineFiles
+    {
+        public string adjacencyMatrix;
+        public int size;
+        public string assignments;
+        public bool ignoreAssignmentFirstLine;
+        public string nodes;
+        public string streamlineTemplate;
+        public int digitsNumber;
+    }
+
     [XmlRoot("BaseConfig")]
     public class BaseConfig
     {
@@ -30,6 +42,8 @@ public class ConfigurationLoader : MonoBehaviour
         public string fileName;
         public bool loadWhole;
         public LoadRegion LoadRegion;
+        public bool loadStreamlines;
+        public StreamlineFiles StreamlineFiles;
     }
     
 
@@ -50,6 +64,8 @@ public class ConfigurationLoader : MonoBehaviour
         EcsSpawner.filename = container.fileName;
         EcsSpawner.loadWhole = container.loadWhole;
         EcsSpawner.region = container.LoadRegion;
+        EcsSpawner.loadStreamlines = container.loadStreamlines;
+        EcsSpawner.streamlineFiles = container.StreamlineFiles;
     }
 
 }
