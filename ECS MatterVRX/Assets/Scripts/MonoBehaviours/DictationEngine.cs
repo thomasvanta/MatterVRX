@@ -101,7 +101,7 @@ public class DictationEngine : MonoBehaviour
 
     private void SaveRecords(string fileName)
     {
-        string path = Application.streamingAssetsPath + "Resources/Saves/" + fileName;
+        string path = Application.streamingAssetsPath + "/Resources/Saves/" + fileName;
         StreamWriter writer = new StreamWriter(path, false, System.Text.Encoding.UTF8);
 
         foreach (string line in records)
@@ -115,7 +115,7 @@ public class DictationEngine : MonoBehaviour
 
     private void LoadRecords(string fileName)
     {
-        string path = Application.streamingAssetsPath + "Resources/Saves/" + fileName;
+        string path = Application.streamingAssetsPath + "/Resources/Saves/" + fileName;
         if (!File.Exists(path)) return;
         StreamReader reader = new StreamReader(path);
 
