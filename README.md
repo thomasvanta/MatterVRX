@@ -1,6 +1,9 @@
 # MatterVRX
 "Matter VR Explorer" is a VR prototype to display a voxel model to visualize matter data.
 
+## Launching the application
+Once you have the compressed folder, decompress it. You should have a .exe in the root folder. Launch it with your VR equipment set up, and it should automatically launch both the application and Steam VR.
+
 ## Controls
 This is the features that are currently implemented, along with their controls :  
 - **Move voxels horizontally** : touching the left track pad in the wanted direction
