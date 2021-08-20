@@ -15,13 +15,13 @@ This is the features that are currently implemented, along with their controls :
 The control panel is an interactive user interface : user can press buttons by pointing it with the **right** controller and pressing the **trigger**.  
 These are the currently implemented buttons on this panel :  
 - **Reset** : resets the voxels positions and scales
-- **Filters** : a dropdown menu which allows user to choose a filter in order to disable certain voxels according to some criteria :
+- **Filters** : a dropdown menu which allows user to choose a filter in order to disable certain voxels according to some criteria. Until they are enabled again, disabled voxels are treated as non-existant and cannot be seen or interacted with.
   - *No Filter* : no filter, all voxels are enabled
   - *Selected* : all unselected voxels are disabled
   - *Unselected* : all selected voxels are disabled
   - *On Value* : this filter uses the slider beneath the button : all voxels which have a value less than the slider's are disabled
 - **Colormaps** : a dropdown menu which allows user to change the colormap used for coloring voxels. There currently are 4 colormaps : *Grey, Hot, Cool, Jet*.
-- **Record annotation** : starts a voice recognition engine which converts voice to text and saves the annotation to all selected voxels
+- **Record annotation** : starts a voice recognition engine which converts voice to text and saves the annotation to all selected voxels. Please note that, at least on Windows, using the dictation engine first requires enabling voice recognition in Windows settings.
 
 ## Using your own data
 In order to use your own data files, you first need to add them to the project. To do so, you must go to the folder located at *ECS MatterVRX_Data/StreamingAssets/Resources/*. You can then add any file and folder you want.  
