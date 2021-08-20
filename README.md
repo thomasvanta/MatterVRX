@@ -2,29 +2,29 @@
 "Matter VR Explorer" is a VR prototype to display a voxel model to visualize matter data.
 
 ## Launching the application
-Once you have the compressed folder, decompress it. You should have a .exe in the root folder. Launch it with your VR equipment set up, and it should automatically launch both the application and Steam VR. Because of the size of the data used, the application can take a while to load, so don't worry if you are stuck for a few minutes in a black void. Also, for some unknown reason, the controllers are for now invisible.
+Download the zip file of the application from the releases section of this github repository. Uncompress it. You obtain a .exe file in the unzipped root folder. Launch it with your VR equipment set up, and it should automatically launch both the application and Steam VR. Because of the size of the data used, the application can take a while to load, so don't worry if you are stuck for a few minutes in a black void. Also, because of a know bug, the controllers are for now invisible.
 
 ## Controls
 This is the features that are currently implemented, along with their controls :  
-- **Move voxels horizontally** : touching the left track pad in the wanted direction
-- **Move voxels vertically** : touching the right track pad in the wanted direction
+- **Move voxels horizontally** : touch the left track pad in the wanted direction
+- **Move voxels vertically** : touch the right track pad in the wanted direction
 - **Zoom** : hold both triggers and change distance between the controllers to zoom in or out
 - **Select a voxel** : point a voxel with one of the controller and grab the grip of said controller
 
 ## Control Panel
-The control panel is an interactive user interface : one can press buttons by pointing it with the **right** controller and pressing the **trigger**.  
+The control panel is an interactive user interface : user can press buttons by pointing it with the **right** controller and pressing the **trigger**.  
 These are the currently implemented buttons on this panel :  
 - **Reset** : resets the voxels positions and scales
-- **Filters** : a dropdown menu which allows one to choose a filter in order to disable certain voxels according to some criteria :
+- **Filters** : a dropdown menu which allows user to choose a filter in order to disable certain voxels according to some criteria :
   - *No Filter* : no filter, all voxels are enabled
   - *Selected* : all unselected voxels are disabled
   - *Unselected* : all selected voxels are disabled
   - *On Value* : this filter uses the slider beneath the button : all voxels which have a value less than the slider's are disabled
-- **Colormaps** : a dropdown menu which allows one to change the colormap used for coloring voxels. There currently are 4 colormaps : *Grey, Hot, Cool, Jet*.
+- **Colormaps** : a dropdown menu which allows user to change the colormap used for coloring voxels. There currently are 4 colormaps : *Grey, Hot, Cool, Jet*.
 - **Record annotation** : starts a voice recognition engine which converts voice to text and saves the annotation to all selected voxels
 
 ## Using your own data
-In order to use your own data files, you first need to add them to the project. To do so, you should go to the folder located at *ECS MatterVRX_Data/StreamingAssets/Resources/*. You can then add any file and folder you'd like.  
+In order to use your own data files, you first need to add them to the project. To do so, you must go to the folder located at *ECS MatterVRX_Data/StreamingAssets/Resources/*. You can then add any file and folder you want.  
 Please note that for the configuration files requiring file names, **you must give paths starting in the Resources folder**. For example, the file "foo.txt" located at *ECS MatterVRX_Data/StreamingAssets/Resources/bar/* must be named "bar/foo.txt"
 
 ### Configuration File
@@ -61,8 +61,8 @@ The attributes are as follows:
 
 
 ## Development : git clone
-When cloning the project you may encounter the following problems :
-- **Loading blocked on SteamVR_Settings.asset** : there are 2 known methods :
+When cloning the project you may encounter the following issues:
+- **Loading blocked on SteamVR_Settings.asset** : there are 2 known methods regarding this issue:
   - *method 1* : wait a bit, then interrupt the loading (alt f4 or task manager). Then restart Unity.
   - *method 2* : interrupt the loading, delete the 3 folders Assets/SteamVR*, and start the Unity project again by ignoring the warning. When in the project, use the package manager to remove the SteamVr SDk, then reinstall it. If the loading blocks again on the SteamVR_Settings.asset, force restart Unity.
 - **missing mesh** :
