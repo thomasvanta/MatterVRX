@@ -2,7 +2,7 @@
 "Matter VR Explorer" is a VR prototype to display a voxel model to visualize matter data.
 
 ## Launching the application
-Once you have the compressed folder, decompress it. You should have a .exe in the root folder. Launch it with your VR equipment set up, and it should automatically launch both the application and Steam VR.
+Once you have the compressed folder, decompress it. You should have a .exe in the root folder. Launch it with your VR equipment set up, and it should automatically launch both the application and Steam VR. Because of the size of the data used, the application can take a while to load, so don't worry if you are stuck for a few minutes in a black void. Also, for some unknown reason, the controllers are for now invisible.
 
 ## Controls
 This is the features that are currently implemented, along with their controls :  
