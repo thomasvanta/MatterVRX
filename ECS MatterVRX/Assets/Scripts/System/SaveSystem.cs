@@ -17,7 +17,7 @@ public class SaveSystem : ComponentSystem
 
         Entities.ForEach((ref VoxelComponent voxel) => {
 
-            string line = voxel.basePosition[0] + "," + voxel.basePosition[1] + "," + voxel.basePosition[2] + ":";
+            string line = voxel.matrixPosition[0] + "," + voxel.matrixPosition[1] + "," + voxel.matrixPosition[2] + ":";
 
             int n = 0;
             for (int j = 0; j < 4; j++)

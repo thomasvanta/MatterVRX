@@ -17,10 +17,13 @@ public class EcsSpawner : MonoBehaviour
     [SerializeField] private UnityEngine.Material voxelMaterial;
     [SerializeField] private UnityEngine.Material lineMaterial;
     public static string filename;
-    public static bool loadWhole;
+    public static string loadMode;
     public static ConfigurationLoader.LoadRegion region;
     public static bool loadStreamlines;
     public static ConfigurationLoader.StreamlineFiles streamlineFiles;
+    public static int3 dummyTumorPos;
+    public static float dummyTumorRadius;
+    public static float dummyTumorPeripherySize;
 
     [SerializeField] private GameObject brainMap;
     private MeshFilter brainMesh;
@@ -80,7 +83,7 @@ public class EcsSpawner : MonoBehaviour
         Debug.Log("dimensions : " + nifti.Dimensions[0] + " ; " + nifti.Dimensions[1] + " ; " + nifti.Dimensions[2]);
 
         int offX, offY, offZ, sizeX, sizeY, sizeZ;
-        if (loadWhole)
+        if (loadMode.ToLower() != "region")
         {
             offX = 0; offY = 0; offZ = 0;
             sizeX = nifti.Dimensions[0];
@@ -116,67 +119,116 @@ public class EcsSpawner : MonoBehaviour
             }
         }
 
-        float3 startOffset = GetMillimeters(offX, offY, offZ, nifti);
-        float3 max = GetMillimeters(offX + sizeX, offY + sizeY, offZ + sizeZ, nifti);
-
-        SetMap(GetMillimeters(nifti.Dimensions[0], nifti.Dimensions[1], nifti.Dimensions[2], nifti), startOffset, max - startOffset);
+        float3 startOffset;
+        float3 max;
 
         // load voxels
+        if (loadMode.ToLower() != "dummytumor")
+        {
+            startOffset = GetMillimeters(offX, offY, offZ, nifti);
+            max = GetMillimeters(offX + sizeX, offY + sizeY, offZ + sizeZ, nifti);
+
+            for (int x = 0; x < sizeX; x++)
+            {
+                for (int y = 0; y < sizeY; y++)
+                {
+                    for (int z = 0; z < sizeZ; z++)
+                    {
+                        float voxelValue = nifti[offX + x, offY + y, offZ + z] / maxAmp;
+                        if (voxelValue <= 0) continue; // ignore negative voxel
+
+                        float3 millimetersPos = GetMillimeters(offX + x, offY + y, offZ + z, nifti);
+
+                        CreateVoxel(entityManager, voxelArchetype, offX + x, offY + y, offZ + z, millimetersPos, voxelValue, annotations, startOffset);
+                    }
+                }
+            }
+
+            if (loadStreamlines) GenerateFloatLines(ref entityManager, startOffset, max);
+        }
+        else
+        {
+            LoadDummyTumor(nifti, maxAmp, entityManager, voxelArchetype, annotations, out startOffset, out max);
+
+            if (loadStreamlines) GenerateFloatLines(ref entityManager, startOffset);
+        }
+
+        SetMap(GetMillimeters(nifti.Dimensions[0], nifti.Dimensions[1], nifti.Dimensions[2], nifti), startOffset, max - startOffset);
+    }
+
+    private void CreateVoxel(EntityManager entityManager, EntityArchetype voxelArchetype, int x, int y, int z, float3 millimetersPos, float voxelValue, Dictionary<int3, int4> annotations, float3 startOffset)
+    {
+        Entity entity = entityManager.CreateEntity(voxelArchetype);
+
+        entityManager.SetComponentData(entity, new Translation { Value = millimetersPos - startOffset });
+
+        Vector4 color = DataReader.ConvertAmplitudeToColor(voxelValue, DataReader.ColorMap.Grey);
+
+        entityManager.SetComponentData(entity, new MainColorComponent { value = color });
+        entityManager.SetComponentData(entity, new OutlineColorComponent { value = color });
+
+        float scale = UnityEngine.Random.Range(minSize, maxSize);
+        entityManager.SetComponentData(entity, new Scale { Value = scale });
+
+        int3 pos = new int3(x, y, z);
+        int4 annot = new int4(-1, -1, -1, -1);
+        if (annotations.ContainsKey(pos)) annot = annotations[pos];
+
+        entityManager.SetComponentData(entity, new VoxelComponent
+        {
+            matrixPosition = pos,
+            basePosition = millimetersPos - startOffset,
+            baseScale = scale,
+            filtered = false,
+            value = voxelValue,
+            //annotationsIds = new DynamicBuffer<BufferInt>()
+            annotationsIds = annot
+        });
+
+        entityManager.SetComponentData(entity, new OutlineComponent { isSelected = false, color = new float4(1, 1, 1, 1) });
+
+        int mesh = UnityEngine.Random.Range(0, meshes.Length);
+        if (mesh == 0) entityManager.SetComponentData(entity, new Rotation { Value = Quaternion.Euler(-15, 0, 90) });
+        else if (mesh == 2) entityManager.SetComponentData(entity, new Rotation { Value = Quaternion.Euler(45, 45, 0) });
+
+        entityManager.SetSharedComponentData(entity, new RenderMesh
+        {
+            mesh = meshes[mesh],
+            material = voxelMaterial
+        });
+    }
+
+    private void LoadDummyTumor(Nifti.NET.Nifti<float> nifti, float maxAmp, EntityManager entityManager, EntityArchetype voxelArchetype, Dictionary<int3, int4> annotations, out float3 startOffset, out float3 max)
+    {
+        float3 center = GetMillimeters(dummyTumorPos.x, dummyTumorPos.y, dummyTumorPos.z, nifti);
+        startOffset = center - dummyTumorPeripherySize - dummyTumorRadius;
+        max = startOffset + 2 * dummyTumorRadius + 2 * dummyTumorPeripherySize;
+
+        int sizeX = nifti.Dimensions[0];
+        int sizeY = nifti.Dimensions[1];
+        int sizeZ = nifti.Dimensions[2];
+
+        int n = 0;
         for (int x = 0; x < sizeX; x++)
         {
             for (int y = 0; y < sizeY; y++)
             {
                 for (int z = 0; z < sizeZ; z++)
                 {
-                    float voxelValue = nifti[offX + x, offY + y, offZ + z] / maxAmp;
+                    float voxelValue = nifti[x, y, z] / maxAmp;
                     if (voxelValue <= 0) continue; // ignore negative voxel
 
-                    float3 millimetersPos = GetMillimeters(offX + x, offY + y, offZ + z, nifti);
+                    float3 millimetersPos = GetMillimeters(x, y, z, nifti);
+                    float dist = Length(millimetersPos - center);
+                    if (dist < dummyTumorRadius || dist > dummyTumorRadius + dummyTumorPeripherySize) continue;
 
-
-                    Entity entity = entityManager.CreateEntity(voxelArchetype);
-
-
-                    entityManager.SetComponentData(entity, new Translation { Value = millimetersPos - startOffset });
-
-                    Vector4 color = DataReader.ConvertAmplitudeToColor(voxelValue, DataReader.ColorMap.Grey);
-
-                    entityManager.SetComponentData(entity, new MainColorComponent { value = color });
-                    entityManager.SetComponentData(entity, new OutlineColorComponent { value = color });
-
-                    float scale = UnityEngine.Random.Range(minSize, maxSize);
-                    entityManager.SetComponentData(entity, new Scale { Value = scale });
-
-                    int3 pos = new int3(x, y, z);
-                    int4 annot = new int4(-1, -1, -1, -1);
-                    if (annotations.ContainsKey(pos)) annot = annotations[pos];
-
-                    entityManager.SetComponentData(entity, new VoxelComponent
-                    {
-                        basePosition = millimetersPos - startOffset,
-                        baseScale = scale,
-                        filtered = false,
-                        value = voxelValue,
-                        //annotationsIds = new DynamicBuffer<BufferInt>()
-                        annotationsIds = annot
-                    });
-
-                    entityManager.SetComponentData(entity, new OutlineComponent { isSelected = false, color = new float4(1, 1, 1, 1) });
-
-                    int mesh = UnityEngine.Random.Range(0, meshes.Length);
-                    if (mesh == 0) entityManager.SetComponentData(entity, new Rotation { Value = Quaternion.Euler(-15, 0, 90) });
-                    else if (mesh == 2) entityManager.SetComponentData(entity, new Rotation { Value = Quaternion.Euler(45, 45, 0) });
-
-                    entityManager.SetSharedComponentData(entity, new RenderMesh
-                    {
-                        mesh = meshes[mesh],
-                        material = voxelMaterial
-                    });
+                    n++;
+                    CreateVoxel(entityManager, voxelArchetype, x, y, z, millimetersPos, voxelValue, annotations, startOffset);
                 }
             }
         }
 
-        if (loadStreamlines) GenerateFloatLines(ref entityManager, startOffset, max);
+        print("created " + n + " voxels in periphery of dummy tumor");
     }
 
     // unsed methode that aproximate steamlines to the closest voxel
@@ -267,6 +319,51 @@ public class EcsSpawner : MonoBehaviour
         }
     }
 
+    private void GenerateFloatLines(ref EntityManager entityManager, float3 startOffet)
+    {
+        EntityArchetype lineArchetype = entityManager.CreateArchetype(
+            typeof(LineComponent),
+            typeof(LineSegment),
+            typeof(LineStyle),
+            typeof(MainColorComponent),     // needed since the lines use the same shader asa the voxels
+            typeof(OutlineColorComponent)   // same
+            );
+
+        List<DataReader.FloatStreamline> streamlines = DataReader.ReadFloatLines(
+            streamlineFiles.adjacencyMatrix,
+            streamlineFiles.assignments,
+            streamlineFiles.nodes,
+            streamlineFiles.streamlineTemplate,
+            streamlineFiles.digitsNumber,
+            streamlineFiles.size,
+            streamlineFiles.ignoreAssignmentFirstLine
+        );
+
+        foreach (DataReader.FloatStreamline line in streamlines)
+        {
+            if (line.strength <= 0 || line.line.Count <= 0) continue;
+
+            int n = line.line.Count;
+
+            float3 v = new float3(line.start.x, line.start.y, line.start.z);
+            for (int i = 0; i < n; i++)
+            {
+                float3 dv = new float3(line.line[i].x, line.line[i].y, line.line[i].z);
+
+                Entity lineEntity = entityManager.CreateEntity(lineArchetype);
+                float lineWidth = 0.05f * line.strength;
+                entityManager.SetComponentData(lineEntity, new LineComponent { baseFrom = v - startOffet, baseTo = v + dv - startOffet, filtered = false, baseWidth = lineWidth });
+                entityManager.SetComponentData(lineEntity, new LineSegment(v - startOffet, v + dv - startOffet));
+                entityManager.SetSharedComponentData(lineEntity, new LineStyle { material = lineMaterial });
+                entityManager.SetComponentData(lineEntity, new MainColorComponent { value = new float4(line.mixedColor.r / 255f, line.mixedColor.g / 255f, line.mixedColor.b / 255f, 1) });
+                entityManager.SetComponentData(lineEntity, new OutlineColorComponent { value = new float4(0, 0, 0, 0) });
+
+                v += dv;
+            }
+
+        }
+    }
+
     bool SegmentIsInCube(float3 v, float3 dv, float3 cubeStart, float3 cubeEnd)
     {
         return (v.x <= Mathf.Max(cubeStart.x, cubeEnd.x) && v.x >= Mathf.Min(cubeStart.x, cubeEnd.x) &&
@@ -275,5 +372,11 @@ public class EcsSpawner : MonoBehaviour
                ((v + dv).x <= Mathf.Max(cubeStart.x, cubeEnd.x) && (v + dv).x >= Mathf.Min(cubeStart.x, cubeEnd.x) &&
                 (v + dv).y <= Mathf.Max(cubeStart.y, cubeEnd.y) && (v + dv).y >= Mathf.Min(cubeStart.y, cubeEnd.y) &&
                 (v + dv).z <= Mathf.Max(cubeStart.z, cubeEnd.z) && (v + dv).z >= Mathf.Min(cubeStart.z, cubeEnd.z));
+    }
+
+    float Length(float3 v)
+    {
+        if (v.x == 0 && v.y == 0 && v.z == 0) return 0;
+        return Mathf.Sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
     }
 }

@@ -40,10 +40,15 @@ public class ConfigurationLoader : MonoBehaviour
         public float verticalSpeed;
         public float horizontalSpeed;
         public string fileName;
-        public bool loadWhole;
+        public string loadMode;
         public LoadRegion LoadRegion;
         public bool loadStreamlines;
         public StreamlineFiles StreamlineFiles;
+        public int dummyTumorPosX;
+        public int dummyTumorPosY;
+        public int dummyTumorPosZ;
+        public float dummyTumorRadius;
+        public float dummyTumorPeriphery;
     }
     
 
@@ -62,10 +67,13 @@ public class ConfigurationLoader : MonoBehaviour
         InputManager.verticalSpeed = container.verticalSpeed;
         InputManager.horizontalSpeed = container.horizontalSpeed;
         EcsSpawner.filename = container.fileName;
-        EcsSpawner.loadWhole = container.loadWhole;
+        EcsSpawner.loadMode = container.loadMode;
         EcsSpawner.region = container.LoadRegion;
         EcsSpawner.loadStreamlines = container.loadStreamlines;
         EcsSpawner.streamlineFiles = container.StreamlineFiles;
+        EcsSpawner.dummyTumorPos = new Unity.Mathematics.int3(container.dummyTumorPosX, container.dummyTumorPosY, container.dummyTumorPosZ);
+        EcsSpawner.dummyTumorRadius = container.dummyTumorRadius;
+        EcsSpawner.dummyTumorPeripherySize = container.dummyTumorPeriphery;
     }
 
 }
