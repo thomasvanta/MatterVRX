@@ -38,6 +38,7 @@ public class Zoom : MonoBehaviour
             float3 delta = InputManager.globalPosition - InputManager.zoomPivot;
             InputManager.globalPosition = InputManager.zoomPivot + scale * delta;
 
+            delta = (float3)dummyTumor.position - InputManager.zoomPivot;
             dummyTumor.position = InputManager.zoomPivot + scale * delta;
             dummyTumor.localScale *= scale;
 
