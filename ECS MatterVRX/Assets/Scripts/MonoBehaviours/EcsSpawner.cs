@@ -221,7 +221,11 @@ public class EcsSpawner : MonoBehaviour
 
                     float3 millimetersPos = GetMillimeters(x, y, z, nifti);
                     float dist = Length(millimetersPos - center);
-                    if (dist < dummyTumorRadius || dist > dummyTumorRadius + dummyTumorPeripherySize) continue;
+                    //if (dist < dummyTumorRadius || dist > dummyTumorRadius + dummyTumorPeripherySize) continue;
+                    if (dist > dummyTumorRadius + dummyTumorPeripherySize) continue;
+
+                    if (dist <= dummyTumorRadius) voxelValue = 1;
+                    else voxelValue = 1 - (dist - dummyTumorRadius) / dummyTumorPeripherySize;
 
                     n++;
                     CreateVoxel(entityManager, voxelArchetype, x, y, z, millimetersPos, voxelValue, annotations, startOffset);
