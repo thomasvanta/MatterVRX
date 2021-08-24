@@ -16,6 +16,7 @@ public class EcsSpawner : MonoBehaviour
     [SerializeField] private Mesh[] meshes;
     [SerializeField] private UnityEngine.Material voxelMaterial;
     [SerializeField] private UnityEngine.Material lineMaterial;
+    [SerializeField] private Transform dummyTumor;
     public static string filename;
     public static string loadMode;
     public static ConfigurationLoader.LoadRegion region;
@@ -227,8 +228,10 @@ public class EcsSpawner : MonoBehaviour
                 }
             }
         }
-
         print("created " + n + " voxels in periphery of dummy tumor");
+
+        dummyTumor.position = center - startOffset;
+        dummyTumor.localScale = 2 * dummyTumorRadius * Vector3.one;
     }
 
     // unsed methode that aproximate steamlines to the closest voxel
@@ -353,7 +356,7 @@ public class EcsSpawner : MonoBehaviour
                 Entity lineEntity = entityManager.CreateEntity(lineArchetype);
                 float lineWidth = 0.05f * line.strength;
                 entityManager.SetComponentData(lineEntity, new LineComponent { baseFrom = v - startOffet, baseTo = v + dv - startOffet, filtered = false, baseWidth = lineWidth });
-                entityManager.SetComponentData(lineEntity, new LineSegment(v - startOffet, v + dv - startOffet));
+                entityManager.SetComponentData(lineEntity, new LineSegment(v - startOffet, v + dv - startOffet, lineWidth));
                 entityManager.SetSharedComponentData(lineEntity, new LineStyle { material = lineMaterial });
                 entityManager.SetComponentData(lineEntity, new MainColorComponent { value = new float4(line.mixedColor.r / 255f, line.mixedColor.g / 255f, line.mixedColor.b / 255f, 1) });
                 entityManager.SetComponentData(lineEntity, new OutlineColorComponent { value = new float4(0, 0, 0, 0) });

@@ -7,7 +7,7 @@
 	<verticalSpeed>1</verticalSpeed>
 	<horizontalSpeed>5</horizontalSpeed>
   <fileName>T1w_acpc_dc_restore_brain.nii.gz</fileName>
-  <loadWhole>false</loadWhole>
+  <loadMode>dummyTumor</loadMode>   <!--can be "dummyTumor", "region" or "whole"-->
   <LoadRegion>
     <x>32</x>
     <y>65</y>
@@ -26,4 +26,9 @@
     <streamlineTemplate>data/output-</streamlineTemplate>
     <digitsNumber>7</digitsNumber>
   </StreamlineFiles>
+  <dummyTumorPosX>100</dummyTumorPosX>
+  <dummyTumorPosY>100</dummyTumorPosY>
+  <dummyTumorPosZ>100</dummyTumorPosZ>
+  <dummyTumorRadius>10</dummyTumorRadius>
+  <dummyTumorPeriphery>4</dummyTumorPeriphery>
 </BaseConfig>		

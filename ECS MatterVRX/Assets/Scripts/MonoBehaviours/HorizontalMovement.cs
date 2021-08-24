@@ -6,6 +6,7 @@ public class HorizontalMovement : MonoBehaviour // left hand for horizontal move
     [SerializeField] private SteamVR_Input_Sources handType;
     [SerializeField] private SteamVR_Action_Vector2 trackPad;
     [SerializeField] private Camera playerCamera;
+    [SerializeField] private Transform dummyTumor;
 
 
     void Update()
@@ -17,6 +18,8 @@ public class HorizontalMovement : MonoBehaviour // left hand for horizontal move
 
         InputManager.globalPosition.x += InputManager.direction.x * Time.deltaTime;
         InputManager.globalPosition.z += InputManager.direction.z * Time.deltaTime;
+
+        dummyTumor.position += new Vector3(InputManager.direction.x, 0, InputManager.direction.z) * Time.deltaTime;
     }
 
     public Vector2 GetDirection()

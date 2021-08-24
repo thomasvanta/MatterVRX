@@ -10,6 +10,7 @@ public class Zoom : MonoBehaviour
     [SerializeField] private SteamVR_Input_Sources leftHandType;
     [SerializeField] private SteamVR_Input_Sources rightHandType;
     [SerializeField] private SteamVR_Action_Single squeeze;
+    [SerializeField] private Transform dummyTumor;
 
     private Vector3 offset;
 
@@ -36,6 +37,9 @@ public class Zoom : MonoBehaviour
 
             float3 delta = InputManager.globalPosition - InputManager.zoomPivot;
             InputManager.globalPosition = InputManager.zoomPivot + scale * delta;
+
+            dummyTumor.position = InputManager.zoomPivot + scale * delta;
+            dummyTumor.localScale *= scale;
 
             offset = newOffset;
         }

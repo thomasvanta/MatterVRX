@@ -6,8 +6,11 @@ using UnityEngine.UI;
 public class UIHandler : MonoBehaviour
 {
     [SerializeField] private Text sliderText;
+    [SerializeField] private Transform dummyTumor;
     public void PressReset()
     {
+        dummyTumor.position -= new Vector3(InputManager.globalPosition.x, InputManager.globalPosition.y, InputManager.globalPosition.z);
+        dummyTumor.localScale = 2 * EcsSpawner.dummyTumorRadius * Vector3.one;
         InputManager.Reset();
     }
 
