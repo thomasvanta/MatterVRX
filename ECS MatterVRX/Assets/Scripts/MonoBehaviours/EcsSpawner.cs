@@ -25,6 +25,7 @@ public class EcsSpawner : MonoBehaviour
     public static int3 dummyTumorPos;
     public static float dummyTumorRadius;
     public static float dummyTumorPeripherySize;
+    public static float dummyTumorHealthySize;
 
     [SerializeField] private GameObject brainMap;
     private MeshFilter brainMesh;
@@ -222,9 +223,10 @@ public class EcsSpawner : MonoBehaviour
                     float3 millimetersPos = GetMillimeters(x, y, z, nifti);
                     float dist = Length(millimetersPos - center);
                     //if (dist < dummyTumorRadius || dist > dummyTumorRadius + dummyTumorPeripherySize) continue;
-                    if (dist > dummyTumorRadius + dummyTumorPeripherySize) continue;
+                    if (dist > dummyTumorRadius + dummyTumorPeripherySize + dummyTumorHealthySize) continue;
 
                     if (dist <= dummyTumorRadius) voxelValue = 1;
+                    else if (dist > dummyTumorRadius + dummyTumorPeripherySize) voxelValue = 0;
                     else voxelValue = 1 - (dist - dummyTumorRadius) / dummyTumorPeripherySize;
 
                     n++;
@@ -312,7 +314,7 @@ public class EcsSpawner : MonoBehaviour
                 if (SegmentIsInCube(v, dv, startOffet, max))
                 {
                     Entity lineEntity = entityManager.CreateEntity(lineArchetype);
-                    float lineWidth = 0.05f * line.strength;
+                    float lineWidth = 0.1f * line.strength;
                     entityManager.SetComponentData(lineEntity, new LineComponent { baseFrom = v - startOffet, baseTo = v + dv - startOffet, filtered = false, baseWidth = lineWidth });
                     entityManager.SetComponentData(lineEntity, new LineSegment(v - startOffet, v + dv - startOffet));
                     entityManager.SetSharedComponentData(lineEntity, new LineStyle { material = lineMaterial });
@@ -358,7 +360,7 @@ public class EcsSpawner : MonoBehaviour
                 float3 dv = new float3(line.line[i].x, line.line[i].y, line.line[i].z);
 
                 Entity lineEntity = entityManager.CreateEntity(lineArchetype);
-                float lineWidth = 0.05f * line.strength;
+                float lineWidth = 0.1f * line.strength;
                 entityManager.SetComponentData(lineEntity, new LineComponent { baseFrom = v - startOffet, baseTo = v + dv - startOffet, filtered = false, baseWidth = lineWidth });
                 entityManager.SetComponentData(lineEntity, new LineSegment(v - startOffet, v + dv - startOffet, lineWidth));
                 entityManager.SetSharedComponentData(lineEntity, new LineStyle { material = lineMaterial });

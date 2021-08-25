@@ -30,7 +30,7 @@ public class UIHandler : MonoBehaviour
     {
         InputManager.valueFilter = val;
         sliderText.text = val.ToString();
-        if (InputManager.filterMode == Filters.OnValue) InputManager.doFilter = true;
+        if (InputManager.filterMode == Filters.GreaterThan || InputManager.filterMode == Filters.LessThan) InputManager.doFilter = true;
     }
 }
 
@@ -39,5 +39,6 @@ public enum Filters
     None,
     Selected,
     Unselected,
-    OnValue
+    GreaterThan,
+    LessThan
 }

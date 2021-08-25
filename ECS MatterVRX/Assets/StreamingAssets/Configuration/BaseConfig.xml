@@ -31,4 +31,5 @@
   <dummyTumorPosZ>100</dummyTumorPosZ>
   <dummyTumorRadius>10</dummyTumorRadius>
   <dummyTumorPeriphery>4</dummyTumorPeriphery>
+  <dummyTumorHealthy>2</dummyTumorHealthy>
 </BaseConfig>		

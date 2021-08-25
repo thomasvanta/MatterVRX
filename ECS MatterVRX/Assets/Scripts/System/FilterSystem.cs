@@ -39,13 +39,28 @@ public class FilterSystem : JobComponentSystem
                     }).Schedule(inputDeps);
                     break;
 
-                case Filters.OnValue:
+                case Filters.GreaterThan:
                     inputDeps = ResetFilters(inputDeps);
 
                     float value = InputManager.valueFilter;
                     jobHandle = Entities.WithEntityQueryOptions(EntityQueryOptions.IncludeDisabled).ForEach((ref Translation translation, ref VoxelComponent voxel) => {
 
-                        if (voxel.value < value)
+                        if (voxel.value <= value)
+                        {
+                            voxel.filtered = true;
+                            translation.Value += hiddenOffset;
+                        }
+
+                    }).Schedule(inputDeps);
+                    break;
+
+                case Filters.LessThan:
+                    inputDeps = ResetFilters(inputDeps);
+
+                    value = InputManager.valueFilter;
+                    jobHandle = Entities.WithEntityQueryOptions(EntityQueryOptions.IncludeDisabled).ForEach((ref Translation translation, ref VoxelComponent voxel) => {
+
+                        if (voxel.value >= value)
                         {
                             voxel.filtered = true;
                             translation.Value += hiddenOffset;

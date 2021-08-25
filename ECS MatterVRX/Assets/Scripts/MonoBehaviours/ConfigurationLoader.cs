@@ -49,6 +49,7 @@ public class ConfigurationLoader : MonoBehaviour
         public int dummyTumorPosZ;
         public float dummyTumorRadius;
         public float dummyTumorPeriphery;
+        public float dummyTumorHealthy;
     }
     
 
@@ -74,6 +75,7 @@ public class ConfigurationLoader : MonoBehaviour
         EcsSpawner.dummyTumorPos = new Unity.Mathematics.int3(container.dummyTumorPosX, container.dummyTumorPosY, container.dummyTumorPosZ);
         EcsSpawner.dummyTumorRadius = container.dummyTumorRadius;
         EcsSpawner.dummyTumorPeripherySize = container.dummyTumorPeriphery;
+        EcsSpawner.dummyTumorHealthySize = container.dummyTumorHealthy;
     }
 
 }
