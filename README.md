@@ -19,7 +19,8 @@ These are the currently implemented buttons on this panel :
   - *No Filter* : no filter, all voxels are enabled
   - *Selected* : all unselected voxels are disabled
   - *Unselected* : all selected voxels are disabled
-  - *On Value* : this filter uses the slider beneath the button : all voxels which have a value less than the slider's are disabled
+  - *Greater Than* : this filter uses the slider beneath the button : all voxels which have a value less than or equal to the slider's are disabled
+  - *Less Than* : this filter uses the slider beneath the button : all voxels which have a value greater than or equal to the slider's are disabled
 - **Colormaps** : a dropdown menu which allows user to change the colormap used for coloring voxels. There currently are 4 colormaps : *Grey, Hot, Cool, Jet*.
 - **Record annotation** : starts a voice recognition engine which converts voice to text and saves the annotation to all selected voxels. Please note that, at least on Windows, using the dictation engine first requires enabling voice recognition in Windows settings.
 
@@ -36,7 +37,10 @@ Located at *ECS MatterVRX_Data/StreamingAssets/Configutation/BaseConfig.xml*, th
 - **vertical speed** : the speed at which voxels move vertically
 - **horizontal speed** : the speed at which voxels move horizontally
 - **file name** : the name of the file to be loaded. It must be a *.nii* or a *.nii.gz*, and must be located in ECS MatterVRX/Assets/Resources/
-- **load whole** : whether the file should be fully loaded into the software or not
+- **load mode** : the loading mode for the file. It can have the following values :
+    - *whole* : load the whole file *(NB : the app gets extremely slow in this mode)*
+    - *region* : loads the cuboid configured below
+    - *dummyTumor* : creates a dummy tumor which parameters are explained later
 - **load region**: if the file is not fully loaded, the loaded cuboid within the file
 - **load streamlines** : whether the software should parse and display streamlines or not
 - **streamline files** : file names and information needed to parse streamlines, if loaded. Please refer to the default ones already present in the project to better understand what is needed where.
@@ -47,6 +51,10 @@ Located at *ECS MatterVRX_Data/StreamingAssets/Configutation/BaseConfig.xml*, th
   - *nodes* : the txt file used to determine the color of a streamline, by mixing the colors of its two extremities
   - *streamline template* : the template name used for the txt individual streamline files
   - *digits number* : the number of digits used in the txt individual streamline files names. For example, if your streamline files are located in the "streamlines" folder and are named "line-0000", "line-0001", "line-"0002", streamline template would be "streamlines/line-" and digits number would be 4
+- **dummy tumor pos X/Y/Z** : the coordinates of the center of the spherical dummy tumor, given in the matrix referential (they must thus be integers)
+- **dummy tumor radius** : the radius of the dummy tumor in millimeters
+- **dummy tumor periphery** : the additional radius in which voxels only have a probability of being tumorous
+- **dummy tumor healthy** : the additional radius in which voxels are all healthy
 
 ### CSS File
 Located at *ECS MatterVRX_Data/StreamingAssets/Configutation/stylesheet.css*, this file contains editable display options. It is written exactly as a standard CSS file, but uses custom classes and attributes.  
