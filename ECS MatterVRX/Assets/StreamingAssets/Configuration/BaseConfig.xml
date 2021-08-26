@@ -34,5 +34,5 @@
   <dummyTumorHealthy>2</dummyTumorHealthy>
   <fogColor>#000000</fogColor> <!-- format #RRGGBB-->
   <fogStart>0</fogStart>
-  <fogEnd>25</fogEnd>
+  <fogEnd>10</fogEnd>
 </BaseConfig>		
