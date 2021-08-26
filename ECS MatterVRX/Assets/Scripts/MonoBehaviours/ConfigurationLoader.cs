@@ -97,24 +97,6 @@ public class ConfigurationLoader : MonoBehaviour
         RenderSettings.fogColor = fogColor;
         RenderSettings.fogStartDistance = container.fogStart;
         RenderSettings.fogEndDistance = container.fogEnd;
-
-        /*
-        bool bConverted = ColorUtility.TryParseHtmlString(container.fogColor, out fogColor);
-
-        if(bConverted)
-        {
-            print("fog activated");
-            RenderSettings.fog = true;
-            RenderSettings.fogColor = fogColor;
-            RenderSettings.fogStartDistance = container.fogStart;
-            RenderSettings.fogEndDistance = container.fogEnd;
-        }
-        else
-        {
-            print("fog deactivated");
-            RenderSettings.fog = false;
-        }
-        */
     }
 
     public static Color ParseHexColor(string colorString)
