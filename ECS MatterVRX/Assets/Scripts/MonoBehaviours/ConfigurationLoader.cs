@@ -4,9 +4,12 @@ using UnityEngine;
 using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
+using System;
 
 public class ConfigurationLoader : MonoBehaviour
 {
+    private static char[] HexVals = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+
     [XmlRoot("LoadRegion")]
     public class LoadRegion
     {
@@ -30,6 +33,14 @@ public class ConfigurationLoader : MonoBehaviour
         public int digitsNumber;
     }
 
+    [XmlRoot("FogConfig")]
+    public class FogConfig
+    {
+        public string color;
+        public float start;
+        public float end;
+    }
+
     [XmlRoot("BaseConfig")]
     public class BaseConfig
     {
@@ -50,6 +61,9 @@ public class ConfigurationLoader : MonoBehaviour
         public float dummyTumorRadius;
         public float dummyTumorPeriphery;
         public float dummyTumorHealthy;
+        public string fogColor;
+        public float fogStart;
+        public float fogEnd;
     }
     
 
@@ -76,6 +90,39 @@ public class ConfigurationLoader : MonoBehaviour
         EcsSpawner.dummyTumorRadius = container.dummyTumorRadius;
         EcsSpawner.dummyTumorPeripherySize = container.dummyTumorPeriphery;
         EcsSpawner.dummyTumorHealthySize = container.dummyTumorHealthy;
+
+        Color fogColor = ParseHexColor(container.fogColor);
+
+        RenderSettings.fog = true;
+        RenderSettings.fogColor = fogColor;
+        RenderSettings.fogStartDistance = container.fogStart;
+        RenderSettings.fogEndDistance = container.fogEnd;
+
+        /*
+        bool bConverted = ColorUtility.TryParseHtmlString(container.fogColor, out fogColor);
+
+        if(bConverted)
+        {
+            print("fog activated");
+            RenderSettings.fog = true;
+            RenderSettings.fogColor = fogColor;
+            RenderSettings.fogStartDistance = container.fogStart;
+            RenderSettings.fogEndDistance = container.fogEnd;
+        }
+        else
+        {
+            print("fog deactivated");
+            RenderSettings.fog = false;
+        }
+        */
     }
 
+    public static Color ParseHexColor(string colorString)
+    {
+        string s = colorString.Trim().Trim('#');
+        float r = (16f * Array.IndexOf(HexVals, s[0]) + Array.IndexOf(HexVals, s[1])) / 255f;
+        float g = (16f * Array.IndexOf(HexVals, s[2]) + Array.IndexOf(HexVals, s[3])) / 255f;
+        float b = (16f * Array.IndexOf(HexVals, s[4]) + Array.IndexOf(HexVals, s[5])) / 255f;
+        return new Color(r, g, b, 1f);
+    }
 }

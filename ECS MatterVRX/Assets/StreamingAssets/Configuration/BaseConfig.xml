@@ -32,4 +32,7 @@
   <dummyTumorRadius>10</dummyTumorRadius>
   <dummyTumorPeriphery>4</dummyTumorPeriphery>
   <dummyTumorHealthy>2</dummyTumorHealthy>
+  <fogColor>#000000FF</fogColor> <!-- format #RRGGBBAA-->
+  <fogStart>0</fogStart>
+  <fogEnd>25</fogEnd>
 </BaseConfig>		
